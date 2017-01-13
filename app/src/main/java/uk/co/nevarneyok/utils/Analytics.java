@@ -45,7 +45,7 @@ public class Analytics {
     public static synchronized void prepareTrackersAndFbLogger(Shop shop, Context context) {
         GoogleAnalytics analytics = GoogleAnalytics.getInstance(context);
         // To enable debug logging use: adb shell setprop log.tag.GAv4 DEBUG
-
+/*
         if (shop == null) {
             deleteAppTrackers();
         } else {
@@ -78,7 +78,7 @@ public class Analytics {
             // Send camping info only once time.
             sendCampaignInfo();
         }
-
+*/
         facebookLogger = AppEventsLogger.newLogger(MyApplication.getInstance());
     }
 

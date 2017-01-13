@@ -1,45 +1,55 @@
 {
   "project_info": {
-    "project_id": "openshop-bf-1216",
-    "project_number": "325761325996",
-    "name": "OpenShop"
+    "project_number": "151924449798",
+    "firebase_url": "https://nevarneyok-5ede3.firebaseio.com",
+    "project_id": "nevarneyok-5ede3",
+    "storage_bucket": "nevarneyok-5ede3.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:325761325996:android:88c2d391918f6b36",
-        "client_id": "android:bf.io.openshop",
-        "client_type": 1,
+        "mobilesdk_app_id": "1:151924449798:android:fbdbe477c3121217",
         "android_client_info": {
-          "package_name": "bf.io.openshop"
+          "package_name": "uk.co.nevarneyok"
         }
       },
-      "oauth_client": [],
-      "api_key": [],
-      "services": {
-        "analytics_service": {
-          "status": 2,
-          "analytics_property":{
-            "tracking_id":"UA-73690730-2"
+      "oauth_client": [
+        {
+          "client_id": "151924449798-obv6i29880kfbgpi6a4k3vj5gc00gli0.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "uk.co.nevarneyok",
+            "certificate_hash": "3D40B2DA64C2EAF7BDBA5D1E45528C0FA91EC3DE"
           }
         },
-        "cloud_messaging_service": {
-          "status": 2,
-          "apns_config": []
+        {
+          "client_id": "151924449798-8fou2rrh7oh4p9k48dv87r1j131jskb0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAc-6H5gdftvmXOefjvGYghC6Q3kOjSMz0"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
         },
         "appinvite_service": {
-          "status": 1,
-          "other_platform_oauth_client": []
-        },
-        "google_signin_service": {
-          "status": 1
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "151924449798-8fou2rrh7oh4p9k48dv87r1j131jskb0.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         },
         "ads_service": {
-          "status": 1
+          "status": 2
         }
       }
     }
   ],
-  "client_info": [],
-  "ARTIFACT_VERSION": "1"
+  "configuration_version": "1"
 }

@@ -19,7 +19,7 @@
 
 
     <application
-        android:name=".promium.MyApplication"
+        android:name=".MyApplication"
         android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -32,7 +32,7 @@
             android:value="@string/facebook_app_id"/>
 
         <activity
-            android:name=".promium.ux.SplashActivity"
+            android:name=".ux.SplashActivity"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -46,7 +46,7 @@
         </activity>
 
         <activity
-            android:name=".promium.ux.MainActivity"
+            android:name=".ux.MainActivity"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateHidden|adjustResize">
             <intent-filter>
@@ -59,7 +59,7 @@
         </activity>
 
         <activity
-            android:name=".promium.ux.RestartAppActivity"
+            android:name=".ux.RestartAppActivity"
             android:screenOrientation="portrait"/>
 
         <!-- Facebook activity used for FB login-->
@@ -83,21 +83,21 @@
         </receiver>
 
         <service
-            android:name=".promium.utils.MyGcmListenerService"
+            android:name=".utils.MyGcmListenerService"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.RECEIVE"/>
             </intent-filter>
         </service>
         <service
-            android:name=".promium.utils.MyInstanceIDListenerService"
+            android:name=".utils.MyInstanceIDListenerService"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.google.android.gms.iid.InstanceID"/>
             </intent-filter>
         </service>
         <service
-            android:name=".promium.utils.MyRegistrationIntentService"
+            android:name=".utils.MyRegistrationIntentService"
             android:exported="false"/>
         <!-- end of GCM part-->
 
