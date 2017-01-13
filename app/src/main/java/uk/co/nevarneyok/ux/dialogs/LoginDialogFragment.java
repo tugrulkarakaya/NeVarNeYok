@@ -13,6 +13,7 @@ import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.DialogFragment;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -28,6 +29,7 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
@@ -40,11 +42,17 @@ import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.Arrays;
+import java.util.concurrent.Executor;
 
 import uk.co.nevarneyok.BuildConfig;
 import uk.co.nevarneyok.CONST;
@@ -63,6 +71,8 @@ import uk.co.nevarneyok.utils.MsgUtils;
 import uk.co.nevarneyok.utils.Utils;
 import uk.co.nevarneyok.ux.MainActivity;
 import timber.log.Timber;
+
+import static com.android.volley.VolleyLog.TAG;
 
 /**
  * Dialog handles user login, registration and forgotten password function.
@@ -85,7 +95,8 @@ public class LoginDialogFragment extends DialogFragment implements FacebookCallb
     private TextInputLayout loginEmailEmailWrapper;
     private TextInputLayout loginEmailPasswordWrapper;
     private TextInputLayout loginEmailForgottenEmailWrapper;
-
+    private FirebaseAuth mAuth;
+    private FirebaseAuth.AuthStateListener mAuthListener;
     /**
      * Creates dialog which handles user login, registration and forgotten password function.
      *
@@ -109,8 +120,24 @@ public class LoginDialogFragment extends DialogFragment implements FacebookCallb
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mAuth = FirebaseAuth.getInstance();
         setStyle(DialogFragment.STYLE_NO_TITLE, R.style.dialogFullscreen);
         progressDialog = Utils.generateProgressDialog(getActivity(), false);
+
+        mAuthListener = new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                FirebaseUser user = firebaseAuth.getCurrentUser();
+                if (user != null) {
+                    // User is signed in
+                    Log.d(TAG, "onAuthStateChanged:signed_in:" + user.getUid());
+                } else {
+                    // User is signed out
+                    Log.d(TAG, "onAuthStateChanged:signed_out");
+                }
+                // ...
+            }
+        };
     }
 
     @Override
@@ -154,6 +181,7 @@ public class LoginDialogFragment extends DialogFragment implements FacebookCallb
                 }
             });
         }
+        mAuth.addAuthStateListener(mAuthListener);
     }
 
     @Override
@@ -407,6 +435,28 @@ public class LoginDialogFragment extends DialogFragment implements FacebookCallb
         }
         if (BuildConfig.DEBUG) Timber.d("Login user: %s", jo.toString());
 
+        mAuth.signInWithEmailAndPassword(editTextEmail.getText().toString().trim(), editTextPassword.getText().toString().trim())
+                .addOnCompleteListener((Executor) this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        Log.d(TAG, "signInWithEmail:onComplete:" + task.isSuccessful());
+
+                        // If sign in fails, display a message to the user. If sign in succeeds
+                        // the auth state listener will be notified and logic to handle the
+                        // signed in user can be handled in the listener.
+                        if (!task.isSuccessful()) {
+                            if (progressDialog != null) progressDialog.cancel();
+                            MsgUtils.showToast(getActivity(), MsgUtils.TOAST_TYPE_MESSAGE, null, MsgUtils.ToastLength.LONG);
+                        }
+                        else{
+                            //get user details here
+
+                            Timber.d(MSG_RESPONSE, response.toString());
+                            handleUserLogin(response);
+                        }
+                    }
+                });
+
         GsonRequest<User> userLoginEmailRequest = new GsonRequest<>(Request.Method.POST, url, jo.toString(), User.class,
                 new Response.Listener<User>() {
                     @Override
@@ -588,7 +638,11 @@ public class LoginDialogFragment extends DialogFragment implements FacebookCallb
     @Override
     public void onStop() {
         super.onStop();
+        if (mAuthListener != null) {
+            mAuth.removeAuthStateListener(mAuthListener);
+        }
         MyApplication.getInstance().getRequestQueue().cancelAll(CONST.LOGIN_DIALOG_REQUESTS_TAG);
+
     }
 
     @Override
