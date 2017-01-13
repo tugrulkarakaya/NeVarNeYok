@@ -36,6 +36,7 @@ public class User {
     private String profileImageUrl;
     @SerializedName("birth_date")
     private long birthDate;
+    private String Uid;
 
     public User() {
     }
@@ -85,6 +86,10 @@ public class User {
     public long getBirthDate(){return this.birthDate;}
 
     public void setBirthDate(long birthDate){this.birthDate = birthDate;}
+
+    public String getUid(){return this.Uid;}
+
+    public void setUid(String Uid){this.Uid = Uid;}
 
     public String getStreet() {
         return street;
@@ -174,8 +179,7 @@ public class User {
         if (gender != null ? !gender.equals(user.gender) : user.gender != null) return false;
         if (birthDate != user.birthDate) return false;
         if (gender != null ? !gender.equals(user.gender) : user.gender != null) return false;
-        if (gender != null ? !gender.equals(user.gender) : user.gender != null) return false;
-        if (gender != null ? !gender.equals(user.gender) : user.gender != null) return false;
+        if (Uid != null ? !Uid.equals(user.Uid) : user.Uid != null) return false;
         return !(country != null ? !country.equals(user.country) : user.country != null);
 
     }
@@ -196,6 +200,7 @@ public class User {
         result = 31 * result + (profileImageUrl != null ? profileImageUrl.hashCode() : 0);
         result = 31 * result + (email != null ? email.hashCode() : 0);
         result = 31 * result + (phone != null ? phone.hashCode() : 0);
+        result = 31 * result + (Uid != null ? Uid.hashCode() : 0);
         result = 31 * result + (gender != null ? gender.hashCode() : 0);
         result = 31 * result + (country != null ? country.hashCode() : 0);
         return result;
@@ -205,6 +210,7 @@ public class User {
     public String toString() {
         return "User{" +
                 "id=" + id +
+                ", Uid='" + Uid + '\'' +
                 ", fbId='" + fbId + '\'' +
                 ", accessToken='" + accessToken + '\'' +
                 ", name='" + name + '\'' +
@@ -220,5 +226,24 @@ public class User {
                 ", country='" + country + '\'' +
                 ", profileImageUrl='" + profileImageUrl + '\'' +
                 '}';
+    }
+
+    public void setUser(User user){
+        this.setId(user.id);
+        this.setFbId(user.fbId);
+        this.setAccessToken(user.accessToken);
+        this.setName(user.name);
+        this.setLastName(user.lastName);
+        this.setStreet(user.street);
+        this.setCity(user.city);
+        this.setHouseNumber(user.houseNumber);
+        this.setZip(user.zip);
+        this.setEmail(user.email);
+        this.setPhone(user.phone);
+        this.setGender(user.gender);
+        this.setCountry(user.country);
+        this.setProfileImageUrl(user.profileImageUrl);
+        this.setBirthDate(user.birthDate);
+        this.setUid(user.Uid);
     }
 }

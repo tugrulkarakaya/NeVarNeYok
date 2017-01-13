@@ -62,6 +62,7 @@ import uk.co.nevarneyok.SettingsMy;
 import uk.co.nevarneyok.api.EndPoints;
 import uk.co.nevarneyok.api.GsonRequest;
 import uk.co.nevarneyok.api.JsonRequest;
+import uk.co.nevarneyok.controllers.UserController;
 import uk.co.nevarneyok.entities.User;
 import uk.co.nevarneyok.interfaces.LoginDialogInterface;
 import uk.co.nevarneyok.listeners.OnSingleClickListener;
@@ -97,6 +98,9 @@ public class LoginDialogFragment extends DialogFragment implements FacebookCallb
     private TextInputLayout loginEmailForgottenEmailWrapper;
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
+    private UserController userController;
+
+
     /**
      * Creates dialog which handles user login, registration and forgotten password function.
      *
@@ -450,30 +454,26 @@ public class LoginDialogFragment extends DialogFragment implements FacebookCallb
                         }
                         else{
                             //get user details here
+                            final User user = new User();
+                            user.setUid(FirebaseAuth.getInstance().getCurrentUser().getUid());
+                            userController = new UserController(user);
+                            userController.retrieveData(new UserController.completion() {
+                                @Override
+                                public void setResult(boolean result) {
+                                    if(result){
+                                        Timber.d(MSG_RESPONSE, user.toString());
+                                        handleUserLogin(user);
+                                    } else{
+                                        userController.signOut();
+                                        if (progressDialog != null) progressDialog.cancel();
+                                        MsgUtils.showToast(getActivity(), MsgUtils.TOAST_TYPE_MESSAGE, null, MsgUtils.ToastLength.LONG);
+                                    }
+                                }
+                            });
 
-                            Timber.d(MSG_RESPONSE, response.toString());
-                            handleUserLogin(response);
                         }
                     }
                 });
-
-        GsonRequest<User> userLoginEmailRequest = new GsonRequest<>(Request.Method.POST, url, jo.toString(), User.class,
-                new Response.Listener<User>() {
-                    @Override
-                    public void onResponse(@NonNull User response) {
-                        Timber.d(MSG_RESPONSE, response.toString());
-                        handleUserLogin(response);
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                if (progressDialog != null) progressDialog.cancel();
-                MsgUtils.logAndShowErrorMessage(getActivity(), error);
-            }
-        });
-        userLoginEmailRequest.setRetryPolicy(MyApplication.getDefaultRetryPolice());
-        userLoginEmailRequest.setShouldCache(false);
-        MyApplication.getInstance().addToRequestQueue(userLoginEmailRequest, CONST.LOGIN_DIALOG_REQUESTS_TAG);
     }
 
     private void handleUserLogin(User user) {
