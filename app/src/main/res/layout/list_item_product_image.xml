@@ -14,7 +14,7 @@
         android:minWidth="160dp"
         android:orientation="vertical">
 
-        <bf.io.openshop.views.ResizableImageViewHeight
+        <uk.co.nevarneyok.views.ResizableImageViewHeight
             android:id="@+id/list_item_product_images_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"

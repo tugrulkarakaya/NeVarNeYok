@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <bf.io.openshop.views.TouchImageView
+    <uk.co.nevarneyok.views.TouchImageView
         android:id="@+id/fullscreen_image"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent" />

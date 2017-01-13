@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <bf.io.openshop.views.loopViewPager.LoopViewPager
+    <uk.co.nevarneyok.views.loopViewPager.LoopViewPager
         android:id="@+id/dialog_product_detail_images_pager"
         android:layout_width="match_parent"
         android:layout_height="0dp"

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest
-    package="bf.io.openshop"
+    package="uk.co.nevarneyok"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
     <!-- General permissions -->
@@ -13,13 +13,13 @@
 
     <!-- GCM permission to prevent other Android applications from registering and receiving the Android application's messages.-->
     <permission
-        android:name="bf.io.openshop.permission.C2D_MESSAGE"
+        android:name="uk.co.nevarneyok.permission.C2D_MESSAGE"
         android:protectionLevel="signature"/>
     <uses-permission android:name="bf.io.openshop.permission.C2D_MESSAGE"/>
 
 
     <application
-        android:name="bf.io.openshop.MyApplication"
+        android:name=".promium.MyApplication"
         android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -32,7 +32,7 @@
             android:value="@string/facebook_app_id"/>
 
         <activity
-            android:name=".ux.SplashActivity"
+            android:name=".promium.ux.SplashActivity"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -46,7 +46,7 @@
         </activity>
 
         <activity
-            android:name=".ux.MainActivity"
+            android:name=".promium.ux.MainActivity"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateHidden|adjustResize">
             <intent-filter>
@@ -59,7 +59,7 @@
         </activity>
 
         <activity
-            android:name="bf.io.openshop.ux.RestartAppActivity"
+            android:name=".promium.ux.RestartAppActivity"
             android:screenOrientation="portrait"/>
 
         <!-- Facebook activity used for FB login-->
@@ -83,21 +83,21 @@
         </receiver>
 
         <service
-            android:name="bf.io.openshop.utils.MyGcmListenerService"
+            android:name=".promium.utils.MyGcmListenerService"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.RECEIVE"/>
             </intent-filter>
         </service>
         <service
-            android:name="bf.io.openshop.utils.MyInstanceIDListenerService"
+            android:name=".promium.utils.MyInstanceIDListenerService"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.google.android.gms.iid.InstanceID"/>
             </intent-filter>
         </service>
         <service
-            android:name="bf.io.openshop.utils.MyRegistrationIntentService"
+            android:name=".promium.utils.MyRegistrationIntentService"
             android:exported="false"/>
         <!-- end of GCM part-->
 

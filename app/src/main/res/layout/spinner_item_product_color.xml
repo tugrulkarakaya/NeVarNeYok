@@ -18,7 +18,7 @@
         android:layout_margin="2dp"
         android:background="@drawable/oval_stroke">
 
-        <bf.io.openshop.views.RoundedImageView
+        <uk.co.nevarneyok.views.RoundedImageView
             android:id="@+id/color_picker_image_view"
             android:layout_width="30dp"
             android:layout_height="30dp"
