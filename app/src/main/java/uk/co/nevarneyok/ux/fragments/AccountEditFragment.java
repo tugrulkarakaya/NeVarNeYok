@@ -152,7 +152,9 @@ public class AccountEditFragment extends Fragment {
     }
 
     private User getUserFromView() {
-        User user = new User();
+        User user = SettingsMy.getActiveUser();
+        if(user == null) return null;
+
         user.setName(Utils.getTextFromInputLayout(nameInputWrapper));
         user.setStreet(Utils.getTextFromInputLayout(streetInputWrapper));
         user.setHouseNumber(Utils.getTextFromInputLayout(houseNumberInputWrapper));

@@ -98,7 +98,6 @@ public class LoginDialogFragment extends DialogFragment implements FacebookCallb
     private TextInputLayout loginEmailForgottenEmailWrapper;
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
-    private UserController userController;
 
 
     /**
@@ -381,39 +380,30 @@ public class LoginDialogFragment extends DialogFragment implements FacebookCallb
 
     private void registerNewUser(EditText editTextEmail, EditText editTextPassword) {
         SettingsMy.setUserEmailHint(editTextEmail.getText().toString());
-        String url = String.format(EndPoints.USER_REGISTER, SettingsMy.getActualNonNullShop(getActivity()).getId());
         progressDialog.show();
 
-        // get selected radio button from radioGroup
-        JSONObject jo = new JSONObject();
-        try {
-            jo.put(JsonUtils.TAG_EMAIL, editTextEmail.getText().toString().trim());
-            jo.put(JsonUtils.TAG_PASSWORD, editTextPassword.getText().toString().trim());
-            jo.put(JsonUtils.TAG_GENDER, loginRegistrationGenderWoman.isChecked() ? "female" : "male");
-        } catch (JSONException e) {
-            Timber.e(e, "Parse new user registration exception");
-            MsgUtils.showToast(getActivity(), MsgUtils.TOAST_TYPE_INTERNAL_ERROR, null, MsgUtils.ToastLength.SHORT);
-            return;
-        }
-        if (BuildConfig.DEBUG) Timber.d("Register new user: %s", jo.toString());
-
-        GsonRequest<User> registerNewUser = new GsonRequest<>(Request.Method.POST, url, jo.toString(), User.class,
-                new Response.Listener<User>() {
+        mAuth.createUserWithEmailAndPassword(editTextEmail.getText().toString().trim(), editTextPassword.getText().toString().trim())
+                .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                     @Override
-                    public void onResponse(@NonNull User response) {
-                        Timber.d(MSG_RESPONSE, response.toString());
-                        handleUserLogin(response);
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        Log.d(TAG, "createUserWithEmail:onComplete:" + task.isSuccessful());
+
+                        // If sign in fails, display a message to the user. If sign in succeeds
+                        // the auth state listener will be notified and logic to handle the
+                        // signed in user can be handled in the listener.
+                        if (!task.isSuccessful()) {
+                            Timber.d(MSG_RESPONSE, "Parse new user registration failed");
+                            MsgUtils.showToast(getActivity(), MsgUtils.TOAST_TYPE_INTERNAL_ERROR, null, MsgUtils.ToastLength.SHORT);
+                            return;
+                        }
+                        User user = new User(task.getResult().getUser().getUid());
+                        user.setGender(loginRegistrationGenderWoman.isChecked() ? "female" : "male");
+                        UserController userController= new UserController(user);
+                        userController.createUserRecord();
+                        Timber.d(MSG_RESPONSE, user.toString());
+                        handleUserLogin(user);
                     }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                if (progressDialog != null) progressDialog.cancel();
-                MsgUtils.logAndShowErrorMessage(getActivity(), error);
-            }
-        });
-        registerNewUser.setRetryPolicy(MyApplication.getDefaultRetryPolice());
-        registerNewUser.setShouldCache(false);
-        MyApplication.getInstance().addToRequestQueue(registerNewUser, CONST.LOGIN_DIALOG_REQUESTS_TAG);
+                });
     }
 
     private void invokeLoginWithEmail() {
@@ -440,7 +430,7 @@ public class LoginDialogFragment extends DialogFragment implements FacebookCallb
         if (BuildConfig.DEBUG) Timber.d("Login user: %s", jo.toString());
 
         mAuth.signInWithEmailAndPassword(editTextEmail.getText().toString().trim(), editTextPassword.getText().toString().trim())
-                .addOnCompleteListener((Executor) this, new OnCompleteListener<AuthResult>() {
+                .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         Log.d(TAG, "signInWithEmail:onComplete:" + task.isSuccessful());
@@ -454,9 +444,8 @@ public class LoginDialogFragment extends DialogFragment implements FacebookCallb
                         }
                         else{
                             //get user details here
-                            final User user = new User();
-                            user.setUid(FirebaseAuth.getInstance().getCurrentUser().getUid());
-                            userController = new UserController(user);
+                            final User user = new User(FirebaseAuth.getInstance().getCurrentUser().getUid());
+                            final UserController userController = new UserController(user);
                             userController.retrieveData(new UserController.completion() {
                                 @Override
                                 public void setResult(boolean result) {

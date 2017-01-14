@@ -2,8 +2,11 @@ package uk.co.nevarneyok.entities;
 
 
 import android.os.Build;
+import android.provider.Contacts;
+import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.gson.annotations.SerializedName;
 
 import java.util.Date;
@@ -38,7 +41,8 @@ public class User {
     private long birthDate;
     private String Uid;
 
-    public User() {
+    public User(String Uid) {
+        this.Uid = Uid;
     }
 
     public long getId() {
