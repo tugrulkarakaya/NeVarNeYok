@@ -32,6 +32,10 @@ public class User {
     private String profileImageUrl;
     private String Uid;
 
+    public User() {
+
+    }
+
     public User(String Uid) {
         this.Uid = Uid;
     }

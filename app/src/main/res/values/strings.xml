@@ -72,6 +72,7 @@
     <string name="House_code">House code</string>
     <string name="City">City</string>
     <string name="ZIP">ZIP</string>
+    <string name="BirthDate">Birth date</string>
 
     <string name="Changing_the_password">Changing the password</string>
     <string name="Password">Password</string>

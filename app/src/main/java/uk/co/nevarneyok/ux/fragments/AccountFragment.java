@@ -16,6 +16,9 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -26,6 +29,7 @@ import uk.co.nevarneyok.R;
 import uk.co.nevarneyok.SettingsMy;
 import uk.co.nevarneyok.api.EndPoints;
 import uk.co.nevarneyok.api.GsonRequest;
+import uk.co.nevarneyok.controllers.UserController;
 import uk.co.nevarneyok.entities.User;
 import uk.co.nevarneyok.entities.delivery.Shipping;
 import uk.co.nevarneyok.interfaces.LoginDialogInterface;
@@ -156,9 +160,34 @@ public class AccountFragment extends Fragment {
         return view;
     }
 
-    private void syncUserData(@NonNull User user) {
-        return;
-        /*
+    private void syncUserData(@NonNull final User user) {
+        // Tugrul tarafından düzenlendi
+        UserController userController;
+        userController = new UserController(user);
+        pDialog.show();
+        userController.retrieveData( new UserController.completion(){
+            @Override
+            public void setResult(boolean result) {
+                if(result){
+                    Timber.d("response: %s", user.toString());
+                    SettingsMy.setActiveUser(user);
+                    refreshScreen(user);
+                    if (pDialog != null) pDialog.cancel();
+                }
+                else{
+                    if (pDialog != null) pDialog.cancel();
+                    JSONObject jsonMessage = new JSONObject();
+                    try {
+                        jsonMessage = new JSONObject(String.valueOf(R.string.Your_session_has_expired_Please_log_in_again));
+                    } catch (JSONException e) {}
+                    MsgUtils.showMessage(getActivity(), jsonMessage);
+                    MsgUtils.logAndShowErrorMessage(getActivity(), null);
+                }
+            }
+        });
+
+        //TODO TUGRUL aşağıdaki kodu sadece en sonraki fragmentin gittiği yerde login sayfasına yönlendirdiği için tutuyorum inceleyeceğim.
+/*
         String url = String.format(EndPoints.USER_SINGLE, SettingsMy.getActualNonNullShop(getActivity()).getId(), user.getId());
         pDialog.show();
 
@@ -181,7 +210,7 @@ public class AccountFragment extends Fragment {
         getUser.setRetryPolicy(MyApplication.getDefaultRetryPolice());
         getUser.setShouldCache(false);
         MyApplication.getInstance().addToRequestQueue(getUser, CONST.ACCOUNT_REQUESTS_TAG);
-        */
+*/
     }
 
     private void refreshScreen(User user) {

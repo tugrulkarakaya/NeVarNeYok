@@ -62,7 +62,7 @@
                 android:layout_height="wrap_content"
                 android:textColor="@color/textPrimary"
                 android:textSize="16sp"
-                tools:text="903578123"/>
+                tools:text="+905321234567"/>
 
             <TextView
                 android:layout_width="wrap_content"
@@ -78,7 +78,7 @@
                 android:layout_height="wrap_content"
                 android:textColor="@color/textPrimary"
                 android:textSize="16sp"
-                tools:text="+905321234567"/>
+                tools:text="17/05/1985"/>
 
         </LinearLayout>
 

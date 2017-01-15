@@ -4,8 +4,11 @@ import android.net.Uri;
 
 import com.google.firebase.auth.FirebaseAuth;
 
+import uk.co.nevarneyok.SettingsMy;
 import uk.co.nevarneyok.api.FIRDataServices;
 import uk.co.nevarneyok.entities.User;
+import uk.co.nevarneyok.ux.MainActivity;
+
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -16,8 +19,10 @@ import com.google.firebase.database.ValueEventListener;
 
 
 public class UserController {
+    public interface FirebaseCallResult{
+        void onComplete(Boolean result);
+    }
     private User user;
-
     public User getUser(){return user;}
 
     public void setUser(User user){this.user = user;}
@@ -54,12 +59,21 @@ public class UserController {
             }
         });
     }
-    public void createUserRecord(){
-        getFirReference().setValue(this.user);
-        if(this.user.getCreateDate()==0){
-            //TODO Tugrul field name'i burada bu şekidl yazmakdoğru değil. user nesnesi üzeirnden setlemeklazım.
-            getFirReference().child("createDate").setValue(ServerValue.TIMESTAMP);
-        }
+    public void save(final FirebaseCallResult callResult){
+        getFirReference().setValue(this.user, new DatabaseReference.CompletionListener() {
+                    @Override
+                    public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+                        if(databaseError == null) {
+                            if (user.getCreateDate() == 0) {
+                                getFirReference().child("createDate").setValue(ServerValue.TIMESTAMP);
+                            }
+                            callResult.onComplete(true);
+                        }else{
+                            callResult.onComplete(false);
+                        }
+                    }
+                }
+        );
     }
 
     public void getAuthInfo(){
@@ -102,7 +116,9 @@ public class UserController {
         });
     }
 
-    public void signOut(){
+    public static void signOut(){
         FirebaseAuth.getInstance().signOut();
+        SettingsMy.setActiveUser(null);
+        MainActivity.invalidateDrawerMenuHeader();
     }
 }

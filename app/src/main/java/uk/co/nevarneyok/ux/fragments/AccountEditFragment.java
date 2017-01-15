@@ -27,6 +27,7 @@ import uk.co.nevarneyok.SettingsMy;
 import uk.co.nevarneyok.api.EndPoints;
 import uk.co.nevarneyok.api.GsonRequest;
 import uk.co.nevarneyok.api.JsonRequest;
+import uk.co.nevarneyok.controllers.UserController;
 import uk.co.nevarneyok.entities.User;
 import uk.co.nevarneyok.listeners.OnSingleClickListener;
 import uk.co.nevarneyok.utils.JsonUtils;
@@ -51,12 +52,9 @@ public class AccountEditFragment extends Fragment {
     // Account editing form
     private LinearLayout accountForm;
     private TextInputLayout nameInputWrapper;
-    private TextInputLayout streetInputWrapper;
-    private TextInputLayout houseNumberInputWrapper;
-    private TextInputLayout cityInputWrapper;
-    private TextInputLayout zipInputWrapper;
     private TextInputLayout phoneInputWrapper;
     private TextInputLayout emailInputWrapper;
+    private TextInputLayout birthDateInputWrapper;
 
     // Password change form
     private LinearLayout passwordForm;
@@ -77,11 +75,8 @@ public class AccountEditFragment extends Fragment {
         accountForm = (LinearLayout) view.findViewById(R.id.account_edit_form);
 
         nameInputWrapper = (TextInputLayout) view.findViewById(R.id.account_edit_name_wrapper);
-        streetInputWrapper = (TextInputLayout) view.findViewById(R.id.account_edit_street_wrapper);
-        houseNumberInputWrapper = (TextInputLayout) view.findViewById(R.id.account_edit_house_number_wrapper);
-        cityInputWrapper = (TextInputLayout) view.findViewById(R.id.account_edit_city_wrapper);
-        zipInputWrapper = (TextInputLayout) view.findViewById(R.id.account_edit_zip_wrapper);
         phoneInputWrapper = (TextInputLayout) view.findViewById(R.id.account_edit_phone_wrapper);
+        birthDateInputWrapper = (TextInputLayout) view.findViewById(R.id.account_edit_birth_date_wrapper);
         emailInputWrapper = (TextInputLayout) view.findViewById(R.id.account_edit_email_wrapper);
 
         // Password form
@@ -156,22 +151,17 @@ public class AccountEditFragment extends Fragment {
         if(user == null) return null;
 
         user.setName(Utils.getTextFromInputLayout(nameInputWrapper));
-        user.setStreet(Utils.getTextFromInputLayout(streetInputWrapper));
-        user.setHouseNumber(Utils.getTextFromInputLayout(houseNumberInputWrapper));
-        user.setCity(Utils.getTextFromInputLayout(cityInputWrapper));
-        user.setZip(Utils.getTextFromInputLayout(zipInputWrapper));
         user.setPhone(Utils.getTextFromInputLayout(phoneInputWrapper));
+        user.setPhone(Utils.getTextFromInputLayout(birthDateInputWrapper));
         return user;
     }
 
     private void refreshScreen(User user) {
         Utils.setTextToInputLayout(nameInputWrapper, user.getName());
-        Utils.setTextToInputLayout(streetInputWrapper, user.getStreet());
-        Utils.setTextToInputLayout(houseNumberInputWrapper, user.getHouseNumber());
-        Utils.setTextToInputLayout(cityInputWrapper, user.getCity());
-        Utils.setTextToInputLayout(zipInputWrapper, user.getZip());
         Utils.setTextToInputLayout(emailInputWrapper, user.getEmail());
         Utils.setTextToInputLayout(phoneInputWrapper, user.getPhone());
+        Utils.setTextToInputLayout(birthDateInputWrapper, user.getPhone());
+
     }
 
     /**
@@ -184,14 +174,11 @@ public class AccountEditFragment extends Fragment {
         // Check and show all missing values
         String fieldRequired = getString(R.string.Required_field);
         boolean nameCheck = Utils.checkTextInputLayoutValueRequirement(nameInputWrapper, fieldRequired);
-        boolean streetCheck = Utils.checkTextInputLayoutValueRequirement(streetInputWrapper, fieldRequired);
-        boolean houseNumberCheck = Utils.checkTextInputLayoutValueRequirement(houseNumberInputWrapper, fieldRequired);
-        boolean cityCheck = Utils.checkTextInputLayoutValueRequirement(cityInputWrapper, fieldRequired);
-        boolean zipCheck = Utils.checkTextInputLayoutValueRequirement(zipInputWrapper, fieldRequired);
         boolean phoneCheck = Utils.checkTextInputLayoutValueRequirement(phoneInputWrapper, fieldRequired);
+        boolean birthDateCheck = Utils.checkTextInputLayoutValueRequirement(birthDateInputWrapper, fieldRequired);
         boolean emailCheck = Utils.checkTextInputLayoutValueRequirement(emailInputWrapper, fieldRequired);
 
-        return nameCheck && streetCheck && houseNumberCheck && cityCheck && zipCheck && phoneCheck && emailCheck;
+        return nameCheck && birthDateCheck && phoneCheck && emailCheck;
     }
 
     /**
@@ -226,48 +213,33 @@ public class AccountEditFragment extends Fragment {
      *
      * @param user new user data.
      */
-    private void putUser(User user) {
+    private void putUser(final User user) {
         if (isRequiredFields()) {
             User activeUser = SettingsMy.getActiveUser();
             if (activeUser != null) {
-                JSONObject joUser = new JSONObject();
-                try {
-                    joUser.put(JsonUtils.TAG_NAME, user.getName());
-                    joUser.put(JsonUtils.TAG_STREET, user.getStreet());
-                    joUser.put(JsonUtils.TAG_HOUSE_NUMBER, user.getHouseNumber());
-                    joUser.put(JsonUtils.TAG_CITY, user.getCity());
-                    joUser.put(JsonUtils.TAG_ZIP, user.getZip());
-                    joUser.put(JsonUtils.TAG_EMAIL, user.getEmail());
-                    joUser.put(JsonUtils.TAG_PHONE, user.getPhone());
-                } catch (JSONException e) {
-                    Timber.e(e, "Parse new user registration exception.");
-                    MsgUtils.showToast(getActivity(), MsgUtils.TOAST_TYPE_INTERNAL_ERROR, null, MsgUtils.ToastLength.SHORT);
-                    return;
-                }
-
-                String url = String.format(EndPoints.USER_SINGLE, SettingsMy.getActualNonNullShop(getActivity()).getId(), activeUser.getId());
-
                 progressDialog.show();
-                GsonRequest<User> req = new GsonRequest<>(Request.Method.PUT, url, joUser.toString(), User.class,
-                        new Response.Listener<User>() {
-                            @Override
-                            public void onResponse(@NonNull User user) {
-                                SettingsMy.setActiveUser(user);
-                                refreshScreen(user);
-                                progressDialog.cancel();
-                                MsgUtils.showToast(getActivity(), MsgUtils.TOAST_TYPE_MESSAGE, getString(R.string.Ok), MsgUtils.ToastLength.SHORT);
-                                getFragmentManager().popBackStackImmediate();
-                            }
-                        }, new Response.ErrorListener() {
+                UserController userController = new UserController(user);
+                userController.save(new UserController.FirebaseCallResult(){
                     @Override
-                    public void onErrorResponse(VolleyError error) {
-                        if (progressDialog != null) progressDialog.cancel();
-                        MsgUtils.logAndShowErrorMessage(getActivity(), error);
+                    public void onComplete(Boolean result) {
+                        if(result){
+                            SettingsMy.setActiveUser(user);
+                            refreshScreen(user);
+                            progressDialog.cancel();
+                            MsgUtils.showToast(getActivity(), MsgUtils.TOAST_TYPE_MESSAGE, getString(R.string.Ok), MsgUtils.ToastLength.SHORT);
+                            getFragmentManager().popBackStackImmediate();
+                        } else{
+                            if (progressDialog != null) progressDialog.cancel();
+                            JSONObject json = new JSONObject();
+                            try {
+                                json = new JSONObject(String.valueOf(R.string.Your_session_has_expired_Please_log_in_again));
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                            MsgUtils.showMessage(getActivity(), json);
+                        }
                     }
-                }, getFragmentManager(), activeUser.getAccessToken());
-                req.setRetryPolicy(MyApplication.getDefaultRetryPolice());
-                req.setShouldCache(false);
-                MyApplication.getInstance().addToRequestQueue(req, CONST.ACCOUNT_EDIT_REQUESTS_TAG);
+                });
             } else {
                 LoginExpiredDialogFragment loginExpiredDialogFragment = new LoginExpiredDialogFragment();
                 loginExpiredDialogFragment.show(getFragmentManager(), "loginExpiredDialogFragment");

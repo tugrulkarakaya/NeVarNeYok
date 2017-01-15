@@ -23,6 +23,7 @@ import java.util.Map;
 import uk.co.nevarneyok.BuildConfig;
 import uk.co.nevarneyok.CONST;
 import uk.co.nevarneyok.MyApplication;
+import uk.co.nevarneyok.controllers.UserController;
 import uk.co.nevarneyok.utils.Utils;
 import uk.co.nevarneyok.ux.dialogs.LoginDialogFragment;
 import uk.co.nevarneyok.ux.dialogs.LoginExpiredDialogFragment;
@@ -156,8 +157,9 @@ public class GsonRequest<T> extends Request<T> {
                 Timber.e("%s URL: %s. ERROR: %s", this.getClass().getSimpleName(), requestUrl, new String(volleyError.networkResponse.data));
 
             // If AccessToken expired. Logout user and redirect to home page.
+            //TODO TUGRUL Move this block to firebase logout part or realted locaiton
             if (getStatusCode() == HttpURLConnection.HTTP_FORBIDDEN && fragmentManager != null) {
-                LoginDialogFragment.logoutUser();
+                UserController.signOut();
                 DialogFragment loginExpiredDialogFragment = new LoginExpiredDialogFragment();
                 loginExpiredDialogFragment.show(fragmentManager, LoginExpiredDialogFragment.class.getSimpleName());
             }

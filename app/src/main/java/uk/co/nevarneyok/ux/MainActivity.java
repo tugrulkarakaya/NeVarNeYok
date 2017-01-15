@@ -543,7 +543,7 @@ public class MainActivity extends AppCompatActivity implements DrawerFragment.Fr
         }
         Timber.d("backStack cleared.");
 //        TODO maybe implement own fragment backStack handling to prevent banner fragment recreation during clearing.
-//        http://stackoverflow.com/questions/12529499/problems-with-android-fragment-back-stack
+//        http://stackoverflow.com/questions/12529499/problems-with-android-fragment-back-stack<
     }
 
     /**

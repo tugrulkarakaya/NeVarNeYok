@@ -53,109 +53,6 @@
                         android:textColor="@color/textPrimary"/>
                 </android.support.design.widget.TextInputLayout>
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:baselineAligned="false"
-                    android:weightSum="1">
-
-                    <android.support.design.widget.TextInputLayout
-                        android:id="@+id/account_edit_street_wrapper"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="8dp"
-                        android:layout_weight="0.65"
-                        android:textColorHint="@color/colorPrimaryLight">
-
-                        <EditText
-                            android:id="@+id/account_edit_street_et"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:hint="@string/Street"
-                            android:inputType="textPostalAddress"
-                            android:nextFocusDown="@+id/account_edit_house_number_et"
-                            android:nextFocusForward="@+id/account_edit_house_number_et"
-                            android:nextFocusRight="@+id/account_edit_house_number_et"
-                            android:singleLine="true"
-                            android:textColor="@color/textPrimary"/>
-                    </android.support.design.widget.TextInputLayout>
-
-                    <android.support.design.widget.TextInputLayout
-                        android:id="@+id/account_edit_house_number_wrapper"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="8dp"
-                        android:layout_weight="0.35"
-                        android:textColorHint="@color/colorPrimaryLight">
-
-                        <EditText
-                            android:id="@+id/account_edit_house_number_et"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:hint="@string/House_code"
-                            android:inputType="textPostalAddress"
-                            android:nextFocusDown="@+id/account_edit_city_et"
-                            android:nextFocusForward="@+id/account_edit_city_et"
-                            android:nextFocusLeft="@+id/account_edit_street_et"
-                            android:nextFocusRight="@+id/account_edit_city_et"
-                            android:singleLine="true"
-                            android:textColor="@color/textPrimary"/>
-                    </android.support.design.widget.TextInputLayout>
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:baselineAligned="false"
-                    android:weightSum="1">
-
-                    <android.support.design.widget.TextInputLayout
-                        android:id="@+id/account_edit_city_wrapper"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="8dp"
-                        android:layout_weight="0.65"
-                        android:textColorHint="@color/colorPrimaryLight">
-
-                        <EditText
-                            android:id="@+id/account_edit_city_et"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:hint="@string/City"
-                            android:inputType="textPostalAddress"
-                            android:nextFocusDown="@+id/account_edit_zip_et"
-                            android:nextFocusForward="@+id/account_edit_zip_et"
-                            android:nextFocusLeft="@+id/account_edit_house_number_et"
-                            android:nextFocusRight="@+id/account_edit_zip_et"
-                            android:singleLine="true"
-                            android:textColor="@color/textPrimary"/>
-                    </android.support.design.widget.TextInputLayout>
-
-                    <android.support.design.widget.TextInputLayout
-                        android:id="@+id/account_edit_zip_wrapper"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="8dp"
-                        android:layout_weight="0.35"
-                        android:textColorHint="@color/colorPrimaryLight">
-
-                        <EditText
-                            android:id="@+id/account_edit_zip_et"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:hint="@string/ZIP"
-                            android:inputType="number"
-                            android:nextFocusDown="@+id/account_edit_phone_et"
-                            android:nextFocusForward="@+id/account_edit_phone_et"
-                            android:nextFocusLeft="@+id/account_edit_city_et"
-                            android:nextFocusRight="@+id/account_edit_phone_et"
-                            android:singleLine="true"
-                            android:textColor="@color/textPrimary"/>
-                    </android.support.design.widget.TextInputLayout>
-                </LinearLayout>
-
                 <android.support.design.widget.TextInputLayout
                     android:id="@+id/account_edit_email_wrapper"
                     android:layout_width="match_parent"
@@ -191,6 +88,24 @@
                         android:singleLine="true"
                         android:textColor="@color/textPrimary"/>
                 </android.support.design.widget.TextInputLayout>
+
+                <android.support.design.widget.TextInputLayout
+                    android:id="@+id/account_edit_birth_date_wrapper"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="12dp"
+                    android:textColorHint="@color/colorPrimaryLight">
+
+                    <EditText
+                        android:id="@+id/account_edit_birth_date_et"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:hint="@string/BirthDate"
+                        android:inputType="date"
+                        android:singleLine="true"
+                        android:textColor="@color/textPrimary"/>
+                </android.support.design.widget.TextInputLayout>
+
             </LinearLayout>
 
             <LinearLayout

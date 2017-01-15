@@ -29,7 +29,6 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
@@ -47,13 +46,11 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.ServerValue;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.Arrays;
-import java.util.concurrent.Executor;
 
 import uk.co.nevarneyok.BuildConfig;
 import uk.co.nevarneyok.CONST;
@@ -114,11 +111,8 @@ public class LoginDialogFragment extends DialogFragment implements FacebookCallb
     }
 
     public static void logoutUser() {
-        LoginManager fbManager = LoginManager.getInstance();
-        if (fbManager != null) fbManager.logOut();
-        SettingsMy.setActiveUser(null);
-        MainActivity.updateCartCountNotification();
-        MainActivity.invalidateDrawerMenuHeader();
+        //TODO TUGRUL tarafından düzenlendi.
+        UserController.signOut();
     }
 
     @Override
@@ -398,13 +392,18 @@ public class LoginDialogFragment extends DialogFragment implements FacebookCallb
                             if (progressDialog != null) progressDialog.cancel();
                             return;
                         }
-                        User user = new User(task.getResult().getUser().getUid());
+                        final User user = new User(task.getResult().getUser().getUid());
                         user.setGender(loginRegistrationGenderWoman.isChecked() ? "female" : "male");
                         UserController userController= new UserController(user);
                         userController.getAuthInfo();
-                        userController.createUserRecord();
-                        Timber.d(MSG_RESPONSE, user.toString());
-                        handleUserLogin(user);
+                        userController.save(new UserController.FirebaseCallResult()
+                        {
+                            @Override
+                            public void onComplete(Boolean result) {
+                                Timber.d(MSG_RESPONSE, user.toString());
+                                handleUserLogin(user);
+                            }
+                        });
                     }
                 });
     }
