@@ -47,6 +47,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.ServerValue;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -400,6 +401,7 @@ public class LoginDialogFragment extends DialogFragment implements FacebookCallb
                         User user = new User(task.getResult().getUser().getUid());
                         user.setGender(loginRegistrationGenderWoman.isChecked() ? "female" : "male");
                         UserController userController= new UserController(user);
+                        userController.getAuthInfo();
                         userController.createUserRecord();
                         Timber.d(MSG_RESPONSE, user.toString());
                         handleUserLogin(user);
