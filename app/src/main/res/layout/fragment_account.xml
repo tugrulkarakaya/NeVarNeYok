@@ -36,24 +36,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/base_margin_vertical"
-                android:text="@string/Address_colon"
-                android:textColor="@color/textSecondary"
-                android:textSize="12sp"/>
-
-            <TextView
-                android:id="@+id/account_address"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="6dp"
-                android:layout_marginRight="6dp"
-                android:textColor="@color/textPrimary"
-                android:textSize="16sp"
-                tools:text="Brnenska 14, Brno, 61200"/>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/base_margin_vertical"
                 android:text="@string/Email_colon"
                 android:textColor="@color/textSecondary"
                 android:textSize="12sp"/>
@@ -81,6 +63,23 @@
                 android:textColor="@color/textPrimary"
                 android:textSize="16sp"
                 tools:text="903578123"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/base_margin_vertical"
+                android:text="@string/BirthDate_colon"
+                android:textColor="@color/textSecondary"
+                android:textSize="12sp"/>
+
+            <TextView
+                android:id="@+id/birth_date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/textPrimary"
+                android:textSize="16sp"
+                tools:text="+905321234567"/>
+
         </LinearLayout>
 
         <LinearLayout

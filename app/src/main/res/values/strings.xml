@@ -63,6 +63,7 @@
     <string name="Address_colon">Address:</string>
     <string name="Email_colon">Email:</string>
     <string name="Phone_colon">Phone:</string>
+    <string name="BirthDate_colon">Birth Date:</string>
 
     <string name="Account">Account</string>
     <string name="Email">Email</string>

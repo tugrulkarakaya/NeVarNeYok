@@ -298,6 +298,9 @@ public class MainActivity extends AppCompatActivity implements DrawerFragment.Fr
      * @param initialize if true, then server run cart synchronization . Useful during app starts.
      */
     private void getCartCount(boolean initialize) {
+        return;
+        //TODO Tugrul cart count bu uygulamada kullanılmayacak
+        /*
         Timber.d("Obtaining cart count.");
         if (cartCountView != null) {
             User user = SettingsMy.getActiveUser();
@@ -350,6 +353,7 @@ public class MainActivity extends AppCompatActivity implements DrawerFragment.Fr
                 }
             }
         }
+        */
     }
 
     /**

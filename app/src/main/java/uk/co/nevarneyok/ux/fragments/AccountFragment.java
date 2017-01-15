@@ -16,6 +16,10 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import uk.co.nevarneyok.CONST;
 import uk.co.nevarneyok.MyApplication;
 import uk.co.nevarneyok.R;
@@ -49,9 +53,9 @@ public class AccountFragment extends Fragment {
     // User information
     private LinearLayout userInfoLayout;
     private TextView tvUserName;
-    private TextView tvAddress;
     private TextView tvPhone;
     private TextView tvEmail;
+    private TextView tvBirthDate;
 
     // Actions
     private Button loginLogoutBtn;
@@ -69,9 +73,9 @@ public class AccountFragment extends Fragment {
 
         userInfoLayout = (LinearLayout) view.findViewById(R.id.account_user_info);
         tvUserName = (TextView) view.findViewById(R.id.account_name);
-        tvAddress = (TextView) view.findViewById(R.id.account_address);
         tvEmail = (TextView) view.findViewById(R.id.account_email);
         tvPhone = (TextView) view.findViewById(R.id.account_phone);
+        tvBirthDate = (TextView) view.findViewById(R.id.birth_date);
 
         updateUserBtn = (Button) view.findViewById(R.id.account_update);
         updateUserBtn.setOnClickListener(new OnSingleClickListener() {
@@ -193,13 +197,15 @@ public class AccountFragment extends Fragment {
             myOrdersBtn.setVisibility(View.VISIBLE);
 
             tvUserName.setText(user.getName());
-
-            String address = user.getStreet();
-            address = appendCommaText(address, user.getHouseNumber(), false);
-            address = appendCommaText(address, user.getCity(), true);
-            address = appendCommaText(address, user.getZip(), true);
-
-            tvAddress.setText(address);
+            if(user.getBirthDate()>0) {
+                SimpleDateFormat sdf = new SimpleDateFormat("dd-M-yyyy");
+                try {
+                    tvBirthDate.setText(sdf.parse(new Date(user.getBirthDate() * 1000).toString()).toString());
+                }
+                catch(java.text.ParseException e) {
+                    tvBirthDate.setText("");
+                }
+            }
             tvEmail.setText(user.getEmail());
             tvPhone.setText(user.getPhone());
         }
@@ -214,6 +220,14 @@ public class AccountFragment extends Fragment {
      * @return concatenated string.
      */
     private String appendCommaText(String result, String append, boolean addComma) {
+        /* a sample usage
+
+        String address = user.getStreet();
+        address = appendCommaText(address, user.getHouseNumber(), false);
+        address = appendCommaText(address, user.getCity(), true);
+        address = appendCommaText(address, user.getZip(), true);
+        */
+
         if (result != null && !result.isEmpty()) {
             if (append != null && !append.isEmpty()) {
                 if (addComma)

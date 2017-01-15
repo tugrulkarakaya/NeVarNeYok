@@ -19,18 +19,17 @@ public class User {
     private String accessToken;
     private String name;
     private String lastName;
+    private String email;
+    private String phone;
+    private String gender;
+    private long birthDate;
+    private long createDate;
     private String street;
     private String city;
     private String houseNumber;
     private String zip;
-    private String email;
-    private String phone;
-    private String gender;
     private String country;
     private String profileImageUrl;
-    private long birthDate;
-    private long createDate;
-    private String photoUrl;
     private String Uid;
 
     public User(String Uid) {
@@ -155,9 +154,6 @@ public class User {
         this.country = country;
     }
 
-    public String getPhotoUrl(){return photoUrl;}
-
-    public void setPhotoUrl(String photoUrl){this.photoUrl  =photoUrl;}
 
     @Override
     public boolean equals(Object o) {
@@ -184,7 +180,6 @@ public class User {
         if (birthDate != user.birthDate) return false;
         if (gender != null ? !gender.equals(user.gender) : user.gender != null) return false;
         if (Uid != null ? !Uid.equals(user.Uid) : user.Uid != null) return false;
-        if (photoUrl != null ? !photoUrl.equals(user.phone) : user.photoUrl != null) return false;
         if (createDate != user.createDate) return false;
         return !(country != null ? !country.equals(user.country) : user.country != null);
 
