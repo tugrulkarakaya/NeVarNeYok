@@ -126,7 +126,8 @@ public class AccountFragment extends Fragment {
                         @Override
                         public void successfulLoginOrRegistration(User user) {
                             refreshScreen(user);
-                            MainActivity.updateCartCountNotification();
+                            //TODO TUGRUL Cart sayısı bilgisi bu uygulamada bize lazım değil.
+                            //MainActivity.updateCartCountNotification();
                         }
                     });
                     loginDialogFragment.show(getFragmentManager(), LoginDialogFragment.class.getSimpleName());
@@ -152,6 +153,8 @@ public class AccountFragment extends Fragment {
     }
 
     private void syncUserData(@NonNull User user) {
+        return;
+        /*
         String url = String.format(EndPoints.USER_SINGLE, SettingsMy.getActualNonNullShop(getActivity()).getId(), user.getId());
         pDialog.show();
 
@@ -174,6 +177,7 @@ public class AccountFragment extends Fragment {
         getUser.setRetryPolicy(MyApplication.getDefaultRetryPolice());
         getUser.setShouldCache(false);
         MyApplication.getInstance().addToRequestQueue(getUser, CONST.ACCOUNT_REQUESTS_TAG);
+        */
     }
 
     private void refreshScreen(User user) {

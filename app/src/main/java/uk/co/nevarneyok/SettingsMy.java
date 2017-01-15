@@ -131,7 +131,7 @@ public class SettingsMy {
             Timber.d("%s - Set active user with name: %s", TAG, user.toString());
         else
             Timber.d("%s - Deleting active user", TAG);
-        SettingsMy.activeUser = user;
+        activeUser = user;
 
         String json = Utils.getGsonParser().toJson(SettingsMy.activeUser);
         SharedPreferences.Editor editor = getSettings().edit();
@@ -168,10 +168,14 @@ public class SettingsMy {
      * @return true if successfully received by third party server. False otherwise.
      */
     public static Boolean getTokenSentToServer() {
+        //TODO TUGRUL token sent will be implemented later. we do not have any 3rd part server yet.
+        return true;
+        /*
         SharedPreferences prefs = getSettings();
         boolean tokenSent = prefs.getBoolean(SENT_TOKEN_TO_SERVER, false);
         Timber.d("%s - Obtained token sent to server: %s", TAG, tokenSent);
         return tokenSent;
+        */
     }
 
     /**

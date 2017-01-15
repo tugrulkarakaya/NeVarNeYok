@@ -23,7 +23,7 @@ import uk.co.nevarneyok.R;
 import uk.co.nevarneyok.api.EndPoints;
 import uk.co.nevarneyok.ux.SplashActivity;
 import timber.log.Timber;
-
+//TODO Tugrul This part should be converted to Firebase
 public class MyGcmListenerService extends GcmListenerService {
 
     private static final int NOTIFICATION_ID = 6342806;

@@ -394,6 +394,7 @@ public class LoginDialogFragment extends DialogFragment implements FacebookCallb
                         if (!task.isSuccessful()) {
                             Timber.d(MSG_RESPONSE, "Parse new user registration failed");
                             MsgUtils.showToast(getActivity(), MsgUtils.TOAST_TYPE_INTERNAL_ERROR, null, MsgUtils.ToastLength.SHORT);
+                            if (progressDialog != null) progressDialog.cancel();
                             return;
                         }
                         User user = new User(task.getResult().getUser().getUid());
@@ -471,6 +472,7 @@ public class LoginDialogFragment extends DialogFragment implements FacebookCallb
 
         // Invalidate GCM token for new registration with authorized user.
         SettingsMy.setTokenSentToServer(false);
+
         if (getActivity() instanceof MainActivity)
             ((MainActivity) getActivity()).registerGcmOnServer();
 

@@ -88,6 +88,9 @@ public class MyRegistrationIntentService extends IntentService {
      * @param token The new token.
      */
     private boolean sendRegistrationToServer(String token) {
+        //TODO TUGRUL. Registration will be imllemeoted on Firebase later.  so return true makes it as it is registered
+        return true;
+/*
         RequestFuture<JSONObject> future = RequestFuture.newFuture();
         final Response.ErrorListener errorListener = new Response.ErrorListener() {
             @Override
@@ -152,6 +155,7 @@ public class MyRegistrationIntentService extends IntentService {
             errorListener.onErrorResponse(new VolleyError(e));
         }
         return false;
+        */
     }
 
     /**

@@ -214,6 +214,8 @@ public class MainActivity extends AppCompatActivity implements DrawerFragment.Fr
         searchSuggestionsList = new ArrayList<>();
 
         // GCM registration //
+
+
         mRegistrationBroadcastReceiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
@@ -250,10 +252,14 @@ public class MainActivity extends AppCompatActivity implements DrawerFragment.Fr
      * Registration is needed for notification messages.
      */
     public void registerGcmOnServer() {
+        //TODO TUGRUL GCM Registraiton intentioanlly commented out here. should be implemented with firebase later.
+
+        /*
         if (Utils.checkPlayServices(this)) {
             Intent intent = new Intent(this, MyRegistrationIntentService.class);
             startService(intent);
         }
+        */
     }
 
     @Override

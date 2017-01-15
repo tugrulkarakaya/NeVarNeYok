@@ -45,6 +45,7 @@ public class Analytics {
     public static synchronized void prepareTrackersAndFbLogger(Shop shop, Context context) {
         GoogleAnalytics analytics = GoogleAnalytics.getInstance(context);
         // To enable debug logging use: adb shell setprop log.tag.GAv4 DEBUG
+        //TODO TUGRUL analytic should be moved to Firebase.
 /*
         if (shop == null) {
             deleteAppTrackers();
