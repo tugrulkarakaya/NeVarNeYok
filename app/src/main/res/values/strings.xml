@@ -79,6 +79,8 @@
     <string name="New_password">New password</string>
     <string name="Password_again">Password again</string>
     <string name="Change_password">Change password</string>
+    <string name="Wrong_password">Wrong password</string>
+    <string name="Password_change_error">Your password could not be changed</string>
     <string name="Save">Save</string>
 
     <string name="My_orders">My orders</string>

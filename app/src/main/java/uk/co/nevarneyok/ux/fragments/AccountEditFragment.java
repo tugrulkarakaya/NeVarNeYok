@@ -5,9 +5,11 @@ import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,6 +21,12 @@ import android.widget.LinearLayout;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthCredential;
+import com.google.firebase.auth.EmailAuthProvider;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -43,6 +51,8 @@ import uk.co.nevarneyok.utils.Utils;
 import uk.co.nevarneyok.ux.MainActivity;
 import uk.co.nevarneyok.ux.dialogs.LoginExpiredDialogFragment;
 import timber.log.Timber;
+
+import static com.facebook.login.widget.ProfilePictureView.TAG;
 
 /**
  * Fragment provides options to editing user information and password change.
@@ -318,43 +328,46 @@ public class AccountEditFragment extends Fragment {
      */
     private void changePassword() {
         if (isRequiredPasswordFields()) {
+            progressDialog.show();
+
             User user = SettingsMy.getActiveUser();
             if (user != null) {
-                String url = String.format(EndPoints.USER_CHANGE_PASSWORD, SettingsMy.getActualNonNullShop(getActivity()).getId(), user.getId());
+                final FirebaseUser firUser = FirebaseAuth.getInstance().getCurrentUser();
 
-                JSONObject jo = new JSONObject();
-                try {
-                    jo.put(JsonUtils.TAG_OLD_PASSWORD, Utils.getTextFromInputLayout(currentPasswordWrapper).trim());
-                    jo.put(JsonUtils.TAG_NEW_PASSWORD, Utils.getTextFromInputLayout(newPasswordWrapper).trim());
-                    Utils.setTextToInputLayout(currentPasswordWrapper, "");
-                    Utils.setTextToInputLayout(newPasswordWrapper, "");
-                    Utils.setTextToInputLayout(newPasswordAgainWrapper, "");
-                } catch (JSONException e) {
-                    Timber.e(e, "Parsing change password exception.");
-                    MsgUtils.showToast(getActivity(), MsgUtils.TOAST_TYPE_INTERNAL_ERROR, null, MsgUtils.ToastLength.SHORT);
-                    return;
-                }
+                AuthCredential credential = EmailAuthProvider
+                        .getCredential(firUser.getEmail(), Utils.getTextFromInputLayout(currentPasswordWrapper).trim());
 
-                progressDialog.show();
-                JsonRequest req = new JsonRequest(Request.Method.PUT, url, jo, new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        Timber.d("Change password successful: %s", response.toString());
-                        MsgUtils.showToast(getActivity(), MsgUtils.TOAST_TYPE_MESSAGE, getString(R.string.Ok), MsgUtils.ToastLength.SHORT);
-                        if (progressDialog != null) progressDialog.cancel();
-                        getFragmentManager().popBackStackImmediate();
-                    }
-                }, new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        if (progressDialog != null) progressDialog.cancel();
-                        MsgUtils.logAndShowErrorMessage(getActivity(), error);
-                    }
-                }, getFragmentManager(), user.getAccessToken());
+                // Prompt the user to re-provide their sign-in credentials
+                firUser.reauthenticate(credential)
+                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                if (task.isSuccessful()) {
+                                    Log.d(TAG, "User re-authenticated.");
+                                    String newPassword = Utils.getTextFromInputLayout(newPasswordWrapper).trim();
 
-                req.setRetryPolicy(MyApplication.getDefaultRetryPolice());
-                req.setShouldCache(false);
-                MyApplication.getInstance().addToRequestQueue(req, CONST.ACCOUNT_EDIT_REQUESTS_TAG);
+                                    firUser.updatePassword(newPassword)
+                                            .addOnCompleteListener(new OnCompleteListener<Void>() {
+                                                @Override
+                                                public void onComplete(@NonNull Task<Void> task) {
+                                                    if (task.isSuccessful()) {
+                                                        Timber.d("Change password successful: %s", firUser);
+                                                        MsgUtils.showToast(getActivity(), MsgUtils.TOAST_TYPE_MESSAGE, getString(R.string.Ok), MsgUtils.ToastLength.SHORT);
+                                                        if (progressDialog != null) progressDialog.cancel();
+                                                        getFragmentManager().popBackStackImmediate();
+                                                    } else {
+                                                        Timber.d("Change password unsuccessful: %s", firUser);
+                                                        MsgUtils.showToast(getActivity(), MsgUtils.TOAST_TYPE_INTERNAL_ERROR, getString(R.string.Password_change_error), MsgUtils.ToastLength.LONG);
+                                                        if (progressDialog != null) progressDialog.cancel();
+                                                    }
+                                                }
+                                            });
+                                } else { //reauthantication is failed
+                                    if (progressDialog != null) progressDialog.cancel();
+                                    MsgUtils.showToast(getActivity(), MsgUtils.TOAST_TYPE_MESSAGE, getString(R.string.Wrong_password), MsgUtils.ToastLength.LONG);
+                                }
+                            }
+                        });
             } else {
                 LoginExpiredDialogFragment loginExpiredDialogFragment = new LoginExpiredDialogFragment();
                 loginExpiredDialogFragment.show(getFragmentManager(), "loginExpiredDialogFragment");
