@@ -399,7 +399,7 @@ public class LoginDialogFragment extends DialogFragment implements FacebookCallb
                         userController.save(new UserController.FirebaseCallResult()
                         {
                             @Override
-                            public void onComplete(Boolean result) {
+                            public void onComplete(boolean result) {
                                 Timber.d(MSG_RESPONSE, user.toString());
                                 handleUserLogin(user);
                             }
@@ -415,28 +415,19 @@ public class LoginDialogFragment extends DialogFragment implements FacebookCallb
         }
     }
 
-    private void logInWithEmail(EditText editTextEmail, EditText editTextPassword) {
+    private void logInWithEmail(EditText editTextEmail, final EditText editTextPassword) {
         SettingsMy.setUserEmailHint(editTextEmail.getText().toString());
         String url = String.format(EndPoints.USER_LOGIN_EMAIL, SettingsMy.getActualNonNullShop(getActivity()).getId());
         progressDialog.show();
 
-        JSONObject jo;
-        try {
-            jo = JsonUtils.createUserAuthentication(editTextEmail.getText().toString().trim(), editTextPassword.getText().toString().trim());
-            editTextPassword.setText("");
-        } catch (JSONException e) {
-            Timber.e(e, "Parse logInWithEmail exception");
-            MsgUtils.showToast(getActivity(), MsgUtils.TOAST_TYPE_INTERNAL_ERROR, null, MsgUtils.ToastLength.SHORT);
-            return;
-        }
-        if (BuildConfig.DEBUG) Timber.d("Login user: %s", jo.toString());
+        if (BuildConfig.DEBUG) Timber.d("Login user: %s", editTextEmail.getText().toString().trim());
 
         mAuth.signInWithEmailAndPassword(editTextEmail.getText().toString().trim(), editTextPassword.getText().toString().trim())
                 .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         Log.d(TAG, "signInWithEmail:onComplete:" + task.isSuccessful());
-
+                        editTextPassword.setText("");
                         // If sign in fails, display a message to the user. If sign in succeeds
                         // the auth state listener will be notified and logic to handle the
                         // signed in user can be handled in the listener.
@@ -446,11 +437,11 @@ public class LoginDialogFragment extends DialogFragment implements FacebookCallb
                         }
                         else{
                             //get user details here
-                            final User user = new User(FirebaseAuth.getInstance().getCurrentUser().getUid());
+                            User user = new User(FirebaseAuth.getInstance().getCurrentUser().getUid());
                             final UserController userController = new UserController(user);
                             userController.retrieveData(new UserController.completion() {
                                 @Override
-                                public void setResult(boolean result) {
+                                public void setResult(boolean result, User user) {
                                     if(result){
                                         Timber.d(MSG_RESPONSE, user.toString());
                                         handleUserLogin(user);

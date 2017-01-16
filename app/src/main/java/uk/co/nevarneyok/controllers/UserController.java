@@ -20,8 +20,12 @@ import com.google.firebase.database.ValueEventListener;
 
 public class UserController {
     public interface FirebaseCallResult{
-        void onComplete(Boolean result);
+        void onComplete(boolean result);
     }
+    public interface completion{
+        void setResult(boolean result, User user);
+    }
+
     private User user;
     public User getUser(){return user;}
 
@@ -38,18 +42,16 @@ public class UserController {
     public UserController(User user){
         this.user = user;
     }
-    public interface completion{
-        void setResult(boolean result);
-    }
+
 
     public void isUserRecorded(final completion callResult ){
         getFirReference().addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if(dataSnapshot.exists()){
-                    callResult.setResult(true);
+                    callResult.setResult(true, user);
                 } else{
-                    callResult.setResult(false);
+                    callResult.setResult(false, user);
                 }
             }
 
@@ -104,14 +106,14 @@ public class UserController {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if(dataSnapshot.exists()){
                     user = dataSnapshot.getValue(User.class);
-                    callResult.setResult(true);
+                    callResult.setResult(true, user);
                 }else{
-                    callResult.setResult(false);
+                    callResult.setResult(false, user);
                 }
             }
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                callResult.setResult(false);
+                callResult.setResult(false, user);
             }
         });
     }

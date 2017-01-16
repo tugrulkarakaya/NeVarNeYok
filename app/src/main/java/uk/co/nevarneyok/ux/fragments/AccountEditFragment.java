@@ -160,6 +160,7 @@ public class AccountEditFragment extends Fragment {
         Utils.setTextToInputLayout(nameInputWrapper, user.getName());
         Utils.setTextToInputLayout(emailInputWrapper, user.getEmail());
         Utils.setTextToInputLayout(phoneInputWrapper, user.getPhone());
+        //TODO Çağrı Cagri CAGRI aşağıda string long tarih seçeneği vs hikayeleri var. sen edit ekranında takvim ile sçeilmesini sağla.
         Utils.setTextToInputLayout(birthDateInputWrapper, user.getPhone());
 
     }
@@ -221,7 +222,7 @@ public class AccountEditFragment extends Fragment {
                 UserController userController = new UserController(user);
                 userController.save(new UserController.FirebaseCallResult(){
                     @Override
-                    public void onComplete(Boolean result) {
+                    public void onComplete(boolean result) {
                         if(result){
                             SettingsMy.setActiveUser(user);
                             refreshScreen(user);

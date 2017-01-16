@@ -160,14 +160,14 @@ public class AccountFragment extends Fragment {
         return view;
     }
 
-    private void syncUserData(@NonNull final User user) {
+    private void syncUserData(@NonNull User user) {
         // Tugrul tarafından düzenlendi
         UserController userController;
         userController = new UserController(user);
         pDialog.show();
         userController.retrieveData( new UserController.completion(){
             @Override
-            public void setResult(boolean result) {
+            public void setResult(boolean result, User user) {
                 if(result){
                     Timber.d("response: %s", user.toString());
                     SettingsMy.setActiveUser(user);
