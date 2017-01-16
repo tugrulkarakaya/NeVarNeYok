@@ -16,6 +16,7 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.DatePicker;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 
 import com.android.volley.Request;
@@ -72,6 +73,7 @@ public class AccountEditFragment extends Fragment {
     private TextInputLayout phoneInputWrapper;
     private TextInputLayout emailInputWrapper;
     private static TextInputLayout birthDateInputWrapper;
+    private EditText edBirtDate;
 
     // Password change form
     private LinearLayout passwordForm;
@@ -94,6 +96,7 @@ public class AccountEditFragment extends Fragment {
         nameInputWrapper = (TextInputLayout) view.findViewById(R.id.account_edit_name_wrapper);
         phoneInputWrapper = (TextInputLayout) view.findViewById(R.id.account_edit_phone_wrapper);
         birthDateInputWrapper = (TextInputLayout) view.findViewById(R.id.account_edit_birth_date_wrapper);
+        edBirtDate = (EditText) view.findViewById(R.id.account_edit_birth_date_et);
         emailInputWrapper = (TextInputLayout) view.findViewById(R.id.account_edit_email_wrapper);
 
         // Password form
@@ -152,7 +155,7 @@ public class AccountEditFragment extends Fragment {
             }
         });
         //Doğum Tarihi
-        birthDateInputWrapper.setOnKeyListener(null);
+        edBirtDate.setKeyListener(null);
         birthDateInputWrapper.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View dateview, boolean hasfocus) {
@@ -162,7 +165,23 @@ public class AccountEditFragment extends Fragment {
                 }
             }
         });
+        edBirtDate.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View dateview, boolean hasfocus) {
+                if(hasfocus){
+                    DialogFragment newFragment = new SelectDateFragment();
+                    newFragment.show(getFragmentManager(), "DatePicker");
+                }
+            }
+        });
         birthDateInputWrapper.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View dateview) {
+                DialogFragment newFragment = new SelectDateFragment();
+                newFragment.show(getFragmentManager(), "DatePicker");
+            }
+        });
+        edBirtDate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View dateview) {
                 DialogFragment newFragment = new SelectDateFragment();
