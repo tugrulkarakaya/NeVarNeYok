@@ -1,16 +1,19 @@
 package uk.co.nevarneyok.ux.fragments;
 
+import android.app.DatePickerDialog;
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputLayout;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.LinearLayout;
 
 import com.android.volley.Request;
@@ -20,12 +23,16 @@ import com.android.volley.VolleyError;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+
 import uk.co.nevarneyok.CONST;
 import uk.co.nevarneyok.MyApplication;
 import uk.co.nevarneyok.R;
 import uk.co.nevarneyok.SettingsMy;
 import uk.co.nevarneyok.api.EndPoints;
-import uk.co.nevarneyok.api.GsonRequest;
 import uk.co.nevarneyok.api.JsonRequest;
 import uk.co.nevarneyok.controllers.UserController;
 import uk.co.nevarneyok.entities.User;
@@ -54,7 +61,7 @@ public class AccountEditFragment extends Fragment {
     private TextInputLayout nameInputWrapper;
     private TextInputLayout phoneInputWrapper;
     private TextInputLayout emailInputWrapper;
-    private TextInputLayout birthDateInputWrapper;
+    private static TextInputLayout birthDateInputWrapper;
 
     // Password change form
     private LinearLayout passwordForm;
@@ -134,7 +141,48 @@ public class AccountEditFragment extends Fragment {
                 }
             }
         });
+        //Doğum Tarihi
+        birthDateInputWrapper.setOnKeyListener(null);
+        birthDateInputWrapper.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View dateview, boolean hasfocus) {
+                if(hasfocus){
+                    DialogFragment newFragment = new SelectDateFragment();
+                    newFragment.show(getFragmentManager(), "DatePicker");
+                }
+            }
+        });
+        birthDateInputWrapper.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View dateview) {
+                DialogFragment newFragment = new SelectDateFragment();
+                newFragment.show(getFragmentManager(), "DatePicker");
+            }
+        });
+
         return view;
+    }
+
+    public static class SelectDateFragment extends DialogFragment implements DatePickerDialog.OnDateSetListener {
+
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            final Calendar calendar = Calendar.getInstance();
+            int yy = calendar.get(Calendar.YEAR);
+            int mm = calendar.get(Calendar.MONTH);
+            int dd = calendar.get(Calendar.DAY_OF_MONTH);
+            return new DatePickerDialog(getActivity(), this, yy, mm, dd);
+        }
+
+        public void onDateSet(DatePicker view, int yy, int mm, int dd) {
+            populateSetDate(yy, mm+1, dd);
+        }
+        public void populateSetDate(int year, int month, int day) {
+            Utils.setTextToInputLayout(birthDateInputWrapper, day+"/"+month+"/"+year);
+        }
+
+        //Doğum Tarihi
+
     }
 
     @Override
@@ -149,10 +197,20 @@ public class AccountEditFragment extends Fragment {
     private User getUserFromView() {
         User user = SettingsMy.getActiveUser();
         if(user == null) return null;
+//Doğum Tarihini miliseconda çeviriyorum
+        final String dTarih = Utils.getTextFromInputLayout(birthDateInputWrapper);
 
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd/MM/yyyy");
+        Date birtdate = null;
+        try {
+            birtdate = simpleDateFormat.parse(dTarih);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+//Doğum Tarihini miliseconda çeviriyorum
         user.setName(Utils.getTextFromInputLayout(nameInputWrapper));
         user.setPhone(Utils.getTextFromInputLayout(phoneInputWrapper));
-        user.setPhone(Utils.getTextFromInputLayout(birthDateInputWrapper));
+        user.setBirthDate(birtdate.getTime());
         return user;
     }
 
@@ -161,7 +219,12 @@ public class AccountEditFragment extends Fragment {
         Utils.setTextToInputLayout(emailInputWrapper, user.getEmail());
         Utils.setTextToInputLayout(phoneInputWrapper, user.getPhone());
         //TODO Çağrı Cagri CAGRI aşağıda string long tarih seçeneği vs hikayeleri var. sen edit ekranında takvim ile sçeilmesini sağla.
-        Utils.setTextToInputLayout(birthDateInputWrapper, user.getPhone());
+        //
+        SimpleDateFormat dateformat = new SimpleDateFormat("dd/MM/yyyy");
+        Date birtdate = new Date();
+        birtdate.setTime(user.getBirthDate());
+        //
+        Utils.setTextToInputLayout(birthDateInputWrapper, dateformat.format(birtdate));
 
     }
 

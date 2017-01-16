@@ -227,13 +227,10 @@ public class AccountFragment extends Fragment {
 
             tvUserName.setText(user.getName());
             if(user.getBirthDate()>0) {
-                SimpleDateFormat sdf = new SimpleDateFormat("dd-M-yyyy");
-                try {
-                    tvBirthDate.setText(sdf.parse(new Date(user.getBirthDate() * 1000).toString()).toString());
-                }
-                catch(java.text.ParseException e) {
-                    tvBirthDate.setText("");
-                }
+                SimpleDateFormat dateformat = new SimpleDateFormat("dd/MM/yyyy");
+                Date birtdate = new Date();
+                birtdate.setTime(user.getBirthDate());
+                tvBirthDate.setText(dateformat.format(birtdate));
             }
             tvEmail.setText(user.getEmail());
             tvPhone.setText(user.getPhone());
