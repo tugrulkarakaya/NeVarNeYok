@@ -51,6 +51,7 @@ import uk.co.nevarneyok.MyApplication;
 import uk.co.nevarneyok.R;
 import uk.co.nevarneyok.SettingsMy;
 import uk.co.nevarneyok.api.EndPoints;
+import uk.co.nevarneyok.api.FIRDataServices;
 import uk.co.nevarneyok.api.JsonRequest;
 import uk.co.nevarneyok.controllers.UserController;
 import uk.co.nevarneyok.entities.User;
@@ -96,7 +97,6 @@ public class AccountEditFragment extends Fragment {
 
     private static final int GALLERY_REQUEST=1;
     private Uri mImageUri =null;
-    private StorageReference mStorage;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -163,7 +163,7 @@ public class AccountEditFragment extends Fragment {
                         mProgress.setCancelable(false);
                         mProgress.show();
                         if(mImageUri!=null){
-                            StorageReference filepath = mStorage.child("users").child(mImageUri.getLastPathSegment());
+                            StorageReference filepath = FIRDataServices.StorageUser.child(mImageUri.getLastPathSegment());
                             filepath.putFile(mImageUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
                                 @Override
                                 public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
