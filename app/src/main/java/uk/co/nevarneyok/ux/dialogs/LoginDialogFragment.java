@@ -29,6 +29,7 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
@@ -39,13 +40,13 @@ import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
+import com.facebook.appevents.AppEventsLogger;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -71,7 +72,24 @@ import uk.co.nevarneyok.utils.Utils;
 import uk.co.nevarneyok.ux.MainActivity;
 import timber.log.Timber;
 
+import com.facebook.AccessToken;
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.FacebookSdk;
+import com.facebook.login.LoginManager;
+import com.facebook.login.LoginResult;
+import com.facebook.login.widget.LoginButton;
+
+import com.google.firebase.auth.AuthCredential;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FacebookAuthProvider;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+
+
 import static com.android.volley.VolleyLog.TAG;
+import static com.facebook.FacebookSdk.getApplicationContext;
 
 /**
  * Dialog handles user login, registration and forgotten password function.
@@ -117,6 +135,9 @@ public class LoginDialogFragment extends DialogFragment implements FacebookCallb
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        FacebookSdk.sdkInitialize(getApplicationContext());
+
         setStyle(DialogFragment.STYLE_NO_TITLE, R.style.dialogFullscreen);
         progressDialog = Utils.generateProgressDialog(getActivity(), false);
         mAuth = FirebaseAuth.getInstance();
@@ -310,6 +331,7 @@ public class LoginDialogFragment extends DialogFragment implements FacebookCallb
         });
 
         // FB login
+
         Button fbLogin = (Button) view.findViewById(R.id.login_form_facebook);
         fbLogin.setOnClickListener(new OnSingleClickListener() {
             @Override
@@ -347,6 +369,41 @@ public class LoginDialogFragment extends DialogFragment implements FacebookCallb
         LoginManager.getInstance().registerCallback(callbackManager, this);
         LoginManager.getInstance().logInWithReadPermissions(this, Arrays.asList("public_profile", "email"));
     }
+    private void handleFacebookAccessToken(AccessToken token) {
+        AuthCredential credential = FacebookAuthProvider.getCredential(token.getToken());
+        mAuth.signInWithCredential(credential)
+                .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        Timber.i("signInWithCredential:onComplete:" + task.isSuccessful());
+                        if (!task.isSuccessful()) {
+                            Timber.e("Error on receiving user profile information.");
+                            Timber.e(task.getException(), "Error: %s", task.getException()==null?"":task.getException().toString());
+                            handleNonFatalError(getString(R.string.Receiving_facebook_profile_failed), true);
+                        }else {
+                            User user = new User(FirebaseAuth.getInstance().getCurrentUser().getUid());
+                            user.setEmail(mAuth.getCurrentUser().getEmail());
+                            user.setName(mAuth.getCurrentUser().getDisplayName());
+
+                            final UserController userController = new UserController(user);
+                            userController.saveAndRetrieveData(new UserController.completion() {
+                                @Override
+                                public void setResult(boolean result, User user) {
+                                    if(result){
+                                        Timber.d(MSG_RESPONSE, user.toString());
+                                        handleUserLogin(user);
+                                    } else{
+                                        userController.signOut();
+                                        if (progressDialog != null) progressDialog.cancel();
+                                        MsgUtils.showToast(getActivity(), MsgUtils.TOAST_TYPE_MESSAGE, null, MsgUtils.ToastLength.LONG);
+                                    }
+                                }
+                            });
+                        }
+                    }
+                });
+    }
+
 
     private void invokeRegisterNewUser() {
         hideSoftKeyboard();
@@ -616,31 +673,15 @@ public class LoginDialogFragment extends DialogFragment implements FacebookCallb
 
     @Override
     public void onSuccess(final LoginResult loginResult) {
+        handleFacebookAccessToken(loginResult.getAccessToken());
+
         Timber.d("FB login success");
         if (loginResult == null) {
             Timber.e("Fb login succeed with null loginResult.");
             handleNonFatalError(getString(R.string.Facebook_login_failed), true);
         } else {
             Timber.d("Result: %s", loginResult.toString());
-            GraphRequest request = GraphRequest.newMeRequest(loginResult.getAccessToken(),
-                    new GraphRequest.GraphJSONObjectCallback() {
-                        @Override
-                        public void onCompleted(JSONObject object, GraphResponse response) {
-                            if (response != null && response.getError() == null) {
-                                verifyUserOnApi(object, loginResult.getAccessToken());
-                            } else {
-                                Timber.e("Error on receiving user profile information.");
-                                if (response != null && response.getError() != null) {
-                                    Timber.e(new RuntimeException(), "Error: %s", response.getError().toString());
-                                }
-                                handleNonFatalError(getString(R.string.Receiving_facebook_profile_failed), true);
-                            }
-                        }
-                    });
-            Bundle parameters = new Bundle();
-            parameters.putString("fields", "id,name,email,gender");
-            request.setParameters(parameters);
-            request.executeAsync();
+            handleFacebookAccessToken(loginResult.getAccessToken());
         }
     }
 

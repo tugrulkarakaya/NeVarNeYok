@@ -100,17 +100,41 @@ public class UserController {
         }
     }
 
-    public void retrieveData(final completion callResult){
+    public void saveAndRetrieveData(final completion callResult) {
+        retrieveData(new completion() {
+            @Override
+            public void setResult(boolean result, User user) {
+                if(result)
+                {
+                   callResult.setResult(true,user);
+                }else{
+                    save(new FirebaseCallResult() {
+                        @Override
+                        public void onComplete(boolean result) {
+                            if(result) {
+                                retrieveData(callResult);
+                            }else{
+                                callResult.setResult(false,null);
+                            }
+                        }
+                    });
+                }
+            }
+        });
+    }
+
+    public void retrieveData(final completion callResult) {
         getFirReference().addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                if(dataSnapshot.exists()){
+                if (dataSnapshot.exists()) {
                     user = dataSnapshot.getValue(User.class);
                     callResult.setResult(true, user);
-                }else{
+                } else {
                     callResult.setResult(false, user);
                 }
             }
+
             @Override
             public void onCancelled(DatabaseError databaseError) {
                 callResult.setResult(false, user);
