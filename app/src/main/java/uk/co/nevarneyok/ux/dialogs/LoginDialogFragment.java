@@ -71,22 +71,11 @@ import uk.co.nevarneyok.utils.MsgUtils;
 import uk.co.nevarneyok.utils.Utils;
 import uk.co.nevarneyok.ux.MainActivity;
 import timber.log.Timber;
-
-import com.facebook.AccessToken;
-import com.facebook.CallbackManager;
-import com.facebook.FacebookCallback;
-import com.facebook.FacebookException;
 import com.facebook.FacebookSdk;
-import com.facebook.login.LoginManager;
-import com.facebook.login.LoginResult;
-import com.facebook.login.widget.LoginButton;
 
 import com.google.firebase.auth.AuthCredential;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FacebookAuthProvider;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-
+import com.google.gson.JsonNull;
 
 import static com.android.volley.VolleyLog.TAG;
 import static com.facebook.FacebookSdk.getApplicationContext;
@@ -531,38 +520,30 @@ public class LoginDialogFragment extends DialogFragment implements FacebookCallb
     }
 
     private void resetPassword(EditText emailOfForgottenPassword) {
-        String url = String.format(EndPoints.USER_RESET_PASSWORD, SettingsMy.getActualNonNullShop(getActivity()).getId());
+        FirebaseAuth auth = FirebaseAuth.getInstance();
+        String emailAddress = emailOfForgottenPassword.getText().toString().trim();
         progressDialog.show();
-
-        JSONObject jo = new JSONObject();
-        try {
-            jo.put(JsonUtils.TAG_EMAIL, emailOfForgottenPassword.getText().toString().trim());
-        } catch (JSONException e) {
-            Timber.e(e, "Parse resetPassword exception");
-            MsgUtils.showToast(getActivity(), MsgUtils.TOAST_TYPE_INTERNAL_ERROR, null, MsgUtils.ToastLength.SHORT);
-            return;
-        }
-        if (BuildConfig.DEBUG) Timber.d("Reset password email: %s", jo.toString());
-
-        JsonRequest req = new JsonRequest(Request.Method.POST, url,
-                jo, new Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response) {
-                Timber.d("Reset password on url success. Response: %s", response.toString());
-                progressDialog.cancel();
-                MsgUtils.showToast(getActivity(), MsgUtils.TOAST_TYPE_MESSAGE, getString(R.string.Check_your_email_we_sent_you_an_confirmation_email), MsgUtils.ToastLength.LONG);
-                setVisibilityOfEmailForgottenForm(false);
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                if (progressDialog != null) progressDialog.cancel();
-                MsgUtils.logAndShowErrorMessage(getActivity(), error);
-            }
-        });
-        req.setRetryPolicy(MyApplication.getDefaultRetryPolice());
-        req.setShouldCache(false);
-        MyApplication.getInstance().addToRequestQueue(req, CONST.LOGIN_DIALOG_REQUESTS_TAG);
+        auth.sendPasswordResetEmail(emailAddress)
+                .addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            Timber.d("Reset password on url success. Response: %s", task.toString());
+                            progressDialog.cancel();
+                            MsgUtils.showToast(getActivity(), MsgUtils.TOAST_TYPE_MESSAGE, getString(R.string.Check_your_email_we_sent_you_an_confirmation_email), MsgUtils.ToastLength.LONG);
+                            setVisibilityOfEmailForgottenForm(false);
+                        }else{
+                            if (progressDialog != null) progressDialog.cancel();
+                            JSONObject json = new JSONObject();
+                            try {
+                                json = new JSONObject(String.valueOf(R.string.Send_password_reset_error));
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                            MsgUtils.showMessage(getActivity(), json);
+                        }
+                    }
+                });
     }
 
     private void hideSoftKeyboard() {

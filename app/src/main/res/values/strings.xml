@@ -81,6 +81,7 @@
     <string name="Change_password">Change password</string>
     <string name="Wrong_password">Wrong password</string>
     <string name="Password_change_error">Your password could not be changed</string>
+    <string name="Send_password_reset_error">An error occured. Your reset email could not be sent</string>
     <string name="Save">Save</string>
 
     <string name="My_orders">My orders</string>
