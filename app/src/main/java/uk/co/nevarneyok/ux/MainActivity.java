@@ -40,6 +40,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.transition.TransitionInflater;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -49,6 +50,8 @@ import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.facebook.appevents.AppEventsLogger;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 import org.json.JSONObject;
 
@@ -63,6 +66,7 @@ import uk.co.nevarneyok.SettingsMy;
 import uk.co.nevarneyok.api.EndPoints;
 import uk.co.nevarneyok.api.GsonRequest;
 import uk.co.nevarneyok.api.JsonRequest;
+import uk.co.nevarneyok.controllers.UserController;
 import uk.co.nevarneyok.entities.Banner;
 import uk.co.nevarneyok.entities.User;
 import uk.co.nevarneyok.entities.cart.CartInfo;
@@ -90,6 +94,8 @@ import uk.co.nevarneyok.ux.fragments.ProductFragment;
 import uk.co.nevarneyok.ux.fragments.SettingsFragment;
 import uk.co.nevarneyok.ux.fragments.WishlistFragment;
 import timber.log.Timber;
+
+import static com.android.volley.VolleyLog.TAG;
 
 /**
  * Application is based on one core activity, which handles fragment operations.
@@ -124,6 +130,9 @@ public class MainActivity extends AppCompatActivity implements DrawerFragment.Fr
     // Fields used in searchView.
     private SimpleCursorAdapter searchSuggestionsAdapter;
     private ArrayList<String> searchSuggestionsList;
+
+    private FirebaseAuth mAuth;
+    private FirebaseAuth.AuthStateListener mAuthListener;
 
     /**
      * Refresh notification number of products in shopping cart.
@@ -177,9 +186,22 @@ public class MainActivity extends AppCompatActivity implements DrawerFragment.Fr
     }
 
     @Override
+    protected void onStart(){
+        super.onStart();
+        mAuth.addAuthStateListener(mAuthListener);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        mAuth.removeAuthStateListener(mAuthListener);
+    }
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mInstance = this;
+        mAuth = FirebaseAuth.getInstance();
+
 
         Timber.d("%s onCreate", MainActivity.class.getSimpleName());
 
@@ -194,6 +216,25 @@ public class MainActivity extends AppCompatActivity implements DrawerFragment.Fr
 //            Picasso.with(this).setIndicatorsEnabled(true);
 //            Picasso.with(this).setLoggingEnabled(true);
 //        }
+
+
+        //Listen for auth state change
+        mAuthListener = new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                FirebaseUser user = firebaseAuth.getCurrentUser();
+                if (user != null) {
+                    // User is signed in
+                    Log.d(TAG, "onAuthStateChanged:signed_in:" + user.getUid());
+                } else {
+                    // User is signed out
+                    SettingsMy.setActiveUser(null);
+                    MainActivity.invalidateDrawerMenuHeader();
+                    Log.d(TAG, "onAuthStateChanged:signed_out");
+                }
+                // ...
+            }
+        };
 
         // Initialize trackers and fbLogger
         Analytics.prepareTrackersAndFbLogger(SettingsMy.getActualNonNullShop(this), getApplicationContext());

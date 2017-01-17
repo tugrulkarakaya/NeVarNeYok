@@ -95,7 +95,6 @@ public class LoginDialogFragment extends DialogFragment implements FacebookCallb
     private TextInputLayout loginEmailPasswordWrapper;
     private TextInputLayout loginEmailForgottenEmailWrapper;
     private FirebaseAuth mAuth;
-    private FirebaseAuth.AuthStateListener mAuthListener;
 
 
     /**
@@ -118,24 +117,9 @@ public class LoginDialogFragment extends DialogFragment implements FacebookCallb
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mAuth = FirebaseAuth.getInstance();
         setStyle(DialogFragment.STYLE_NO_TITLE, R.style.dialogFullscreen);
         progressDialog = Utils.generateProgressDialog(getActivity(), false);
-
-        mAuthListener = new FirebaseAuth.AuthStateListener() {
-            @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                FirebaseUser user = firebaseAuth.getCurrentUser();
-                if (user != null) {
-                    // User is signed in
-                    Log.d(TAG, "onAuthStateChanged:signed_in:" + user.getUid());
-                } else {
-                    // User is signed out
-                    Log.d(TAG, "onAuthStateChanged:signed_out");
-                }
-                // ...
-            }
-        };
+        mAuth = FirebaseAuth.getInstance();
     }
 
     @Override
@@ -179,7 +163,6 @@ public class LoginDialogFragment extends DialogFragment implements FacebookCallb
                 }
             });
         }
-        mAuth.addAuthStateListener(mAuthListener);
     }
 
     @Override
@@ -621,9 +604,6 @@ public class LoginDialogFragment extends DialogFragment implements FacebookCallb
     @Override
     public void onStop() {
         super.onStop();
-        if (mAuthListener != null) {
-            mAuth.removeAuthStateListener(mAuthListener);
-        }
         MyApplication.getInstance().getRequestQueue().cancelAll(CONST.LOGIN_DIALOG_REQUESTS_TAG);
 
     }
