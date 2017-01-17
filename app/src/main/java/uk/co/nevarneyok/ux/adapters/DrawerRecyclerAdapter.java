@@ -12,6 +12,8 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.squareup.picasso.Picasso;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -99,9 +101,13 @@ public class DrawerRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vie
             User user = SettingsMy.getActiveUser();
             if (user != null) {
                 viewHolderHeader.userName.setText(user.getEmail());
+                if(user.getProfileImageUrl()!=null){
+                    Picasso.with(this.context).load(user.getProfileImageUrl()).into(viewHolderHeader.accountPhoto);
+                }
             } else {
                 viewHolderHeader.userName.setText(context.getString(R.string.Unknown_user));
             }
+
         }
     }
 
@@ -226,10 +232,12 @@ public class DrawerRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vie
 
     public static class ViewHolderHeader extends RecyclerView.ViewHolder {
         public TextView userName;
+        public ImageView accountPhoto;
 
         public ViewHolderHeader(View headerView, final DrawerRecyclerInterface drawerRecyclerInterface) {
             super(headerView);
             userName = (TextView) headerView.findViewById(R.id.navigation_drawer_list_header_text);
+            accountPhoto = (ImageView) headerView.findViewById(R.id.account_photo);
             headerView.setOnClickListener(new OnSingleClickListener() {
                 @Override
                 public void onSingleClick(View v) {
