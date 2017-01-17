@@ -9,12 +9,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.squareup.picasso.Picasso;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -60,11 +62,13 @@ public class AccountFragment extends Fragment {
     private TextView tvPhone;
     private TextView tvEmail;
     private TextView tvBirthDate;
-
+    private ImageView profilePicture;
     // Actions
     private Button loginLogoutBtn;
     private Button updateUserBtn;
     private Button myOrdersBtn;
+
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -80,6 +84,7 @@ public class AccountFragment extends Fragment {
         tvEmail = (TextView) view.findViewById(R.id.account_email);
         tvPhone = (TextView) view.findViewById(R.id.account_phone);
         tvBirthDate = (TextView) view.findViewById(R.id.birth_date);
+        profilePicture = (ImageView) view.findViewById(R.id.account_photo);
 
         updateUserBtn = (Button) view.findViewById(R.id.account_update);
         updateUserBtn.setOnClickListener(new OnSingleClickListener() {
@@ -234,6 +239,15 @@ public class AccountFragment extends Fragment {
             }
             tvEmail.setText(user.getEmail());
             tvPhone.setText(user.getPhone());
+            String imageUrl=null;
+            if (user.getProfileImageUrl()!=null) {
+                imageUrl =user.getProfileImageUrl().toString();
+
+                if (imageUrl!=null){
+                    Picasso.with(this.getContext()).load(imageUrl).into(profilePicture);
+                }
+
+            }
         }
     }
 

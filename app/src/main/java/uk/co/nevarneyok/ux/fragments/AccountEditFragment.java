@@ -1,9 +1,12 @@
 package uk.co.nevarneyok.ux.fragments;
 
+import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.DialogFragment;
@@ -15,11 +18,17 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
+import com.squareup.picasso.Picasso;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -45,6 +54,7 @@ import uk.co.nevarneyok.ux.MainActivity;
 import uk.co.nevarneyok.ux.dialogs.LoginExpiredDialogFragment;
 import timber.log.Timber;
 
+
 /**
  * Fragment provides options to editing user information and password change.
  */
@@ -64,6 +74,7 @@ public class AccountEditFragment extends Fragment {
     private TextInputLayout emailInputWrapper;
     private static TextInputLayout birthDateInputWrapper;
     private EditText edBirtDate;
+    private ImageView profilePicture;
 
     // Password change form
     private LinearLayout passwordForm;
@@ -71,13 +82,19 @@ public class AccountEditFragment extends Fragment {
     private TextInputLayout newPasswordWrapper;
     private TextInputLayout newPasswordAgainWrapper;
 
+    private ProgressDialog mProgress;
+
+    private static final int GALLERY_REQUEST=1;
+    private Uri mImageUri =null;
+    private StorageReference mStorage;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         Timber.d("%s - OnCreateView", this.getClass().getSimpleName());
         MainActivity.setActionBarTitle(getString(R.string.Account));
 
         View view = inflater.inflate(R.layout.fragment_account_edit, container, false);
-
+        mStorage = FirebaseStorage.getInstance().getReference();
         progressDialog = Utils.generateProgressDialog(getActivity(), false);
 
         // Account details form
@@ -88,12 +105,15 @@ public class AccountEditFragment extends Fragment {
         birthDateInputWrapper = (TextInputLayout) view.findViewById(R.id.account_edit_birth_date_wrapper);
         edBirtDate = (EditText) view.findViewById(R.id.account_edit_birth_date_et);
         emailInputWrapper = (TextInputLayout) view.findViewById(R.id.account_edit_email_wrapper);
+        profilePicture = (ImageView) view.findViewById(R.id.account_photo);
 
         // Password form
         passwordForm = (LinearLayout) view.findViewById(R.id.account_edit_password_form);
         currentPasswordWrapper = (TextInputLayout) view.findViewById(R.id.account_edit_password_current_wrapper);
         newPasswordWrapper = (TextInputLayout) view.findViewById(R.id.account_edit_password_new_wrapper);
         newPasswordAgainWrapper = (TextInputLayout) view.findViewById(R.id.account_edit_password_new_again_wrapper);
+
+        mProgress = new ProgressDialog(view.getContext());
 
         final Button btnChangePassword = (Button) view.findViewById(R.id.account_edit_change_form_btn);
         btnChangePassword.setOnClickListener(new View.OnClickListener() {
@@ -128,8 +148,22 @@ public class AccountEditFragment extends Fragment {
             public void onSingleClick(View view) {
                 if (!isPasswordForm) {
                     try {
-                        User user = getUserFromView();
-                        putUser(user);
+                        final User user = getUserFromView();
+                        mProgress.setMessage("Bilgileriniz Kaydediliyor...");
+                        mProgress.setCancelable(false);
+                        mProgress.show();
+                        if(mImageUri!=null){
+                            StorageReference filepath = mStorage.child("users").child(mImageUri.getLastPathSegment());
+                            filepath.putFile(mImageUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                                @Override
+                                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                                    Uri downloadUrl = taskSnapshot.getDownloadUrl();
+                                    user.setProfileImageUrl(downloadUrl.toString());
+                                    putUser(user);
+                                }
+                            });
+                        }
+                        mProgress.dismiss();
                     } catch (Exception e) {
                         Timber.e(e, "Update user information exception.");
                         MsgUtils.showToast(getActivity(), MsgUtils.TOAST_TYPE_INTERNAL_ERROR, null, MsgUtils.ToastLength.SHORT);
@@ -244,6 +278,15 @@ public class AccountEditFragment extends Fragment {
         birtdate.setTime(user.getBirthDate());
         //
         Utils.setTextToInputLayout(birthDateInputWrapper, dateformat.format(birtdate));
+        String imageUrl=null;
+        if (user.getProfileImageUrl()!=null) {
+            imageUrl =user.getProfileImageUrl().toString();
+
+            if (imageUrl!=null){
+                Picasso.with(this.getContext()).load(imageUrl).into(profilePicture);
+            }
+
+        }
 
     }
 
@@ -386,5 +429,30 @@ public class AccountEditFragment extends Fragment {
         if (progressDialog != null) progressDialog.cancel();
         MyApplication.getInstance().cancelPendingRequests(CONST.ACCOUNT_EDIT_REQUESTS_TAG);
         super.onStop();
+    }
+
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == GALLERY_REQUEST && resultCode == Activity.RESULT_OK){
+            mImageUri = data.getData();
+
+            profilePicture.setImageURI(mImageUri);
+        }
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        profilePicture.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent galeryIntent = new Intent(Intent.ACTION_GET_CONTENT);
+                galeryIntent.setType("image/*");
+                startActivityForResult(galeryIntent,GALLERY_REQUEST);
+            }
+        });
     }
 }
