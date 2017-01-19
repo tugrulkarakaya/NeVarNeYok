@@ -39,6 +39,7 @@ import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.GraphRequest;
+import com.facebook.GraphRequestAsyncTask;
 import com.facebook.GraphResponse;
 import com.facebook.appevents.AppEventsLogger;
 import com.facebook.login.LoginManager;
@@ -358,7 +359,23 @@ public class LoginDialogFragment extends DialogFragment implements FacebookCallb
         LoginManager.getInstance().registerCallback(callbackManager, this);
         LoginManager.getInstance().logInWithReadPermissions(this, Arrays.asList("public_profile", "email"));
     }
-    private void handleFacebookAccessToken(AccessToken token) {
+    private void handleFacebookAccessToken(final AccessToken token) {
+
+        GraphRequest request = GraphRequest.newMeRequest(token, new GraphRequest.GraphJSONObjectCallback() {
+            @Override
+            public void onCompleted(JSONObject fbUser, GraphResponse graphResponse) {
+                firebaseAccessCheck(token, fbUser);
+            }
+        });
+
+        Bundle bundle=new Bundle();
+        bundle.putString("fields","id,email,name");
+        request.setParameters(bundle);
+        request.executeAsync();
+
+    }
+
+    private void firebaseAccessCheck(AccessToken token, final JSONObject fbUser){
         AuthCredential credential = FacebookAuthProvider.getCredential(token.getToken());
         mAuth.signInWithCredential(credential)
                 .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
@@ -371,9 +388,12 @@ public class LoginDialogFragment extends DialogFragment implements FacebookCallb
                             handleNonFatalError(getString(R.string.Receiving_facebook_profile_failed), true);
                         }else {
                             User user = new User(FirebaseAuth.getInstance().getCurrentUser().getUid());
-                            user.setEmail(mAuth.getCurrentUser().getEmail());
-                            user.setName(mAuth.getCurrentUser().getDisplayName());
+                            user.setEmail(fbUser.optString("email"));
+                            user.setName(fbUser.optString("name"));
+                            user.setFbId(fbUser.optString("id"));
+                            user.setProviderId(fbUser.optString("id"));
 
+                            user.setProfileImageUrl("https://graph.facebook.com/"+user.getProviderId()+"/picture?type=large");
                             final UserController userController = new UserController(user);
                             userController.saveAndRetrieveData(new UserController.completion() {
                                 @Override
@@ -392,7 +412,6 @@ public class LoginDialogFragment extends DialogFragment implements FacebookCallb
                     }
                 });
     }
-
 
     private void invokeRegisterNewUser() {
         hideSoftKeyboard();
@@ -536,7 +555,7 @@ public class LoginDialogFragment extends DialogFragment implements FacebookCallb
                             if (progressDialog != null) progressDialog.cancel();
                             JSONObject json = new JSONObject();
                             try {
-                                json = new JSONObject(String.valueOf(R.string.Send_password_reset_error));
+                                json = new JSONObject(getString(R.string.Send_password_reset_error));
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
@@ -654,8 +673,6 @@ public class LoginDialogFragment extends DialogFragment implements FacebookCallb
 
     @Override
     public void onSuccess(final LoginResult loginResult) {
-        handleFacebookAccessToken(loginResult.getAccessToken());
-
         Timber.d("FB login success");
         if (loginResult == null) {
             Timber.e("Fb login succeed with null loginResult.");

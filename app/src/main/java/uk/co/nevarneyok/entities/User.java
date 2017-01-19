@@ -31,6 +31,8 @@ public class User {
     private String country;
     private String profileImageUrl;
     private String Uid;
+    private String providerId;
+    private String provider;
 
     public User() {
 
@@ -158,6 +160,13 @@ public class User {
         this.country = country;
     }
 
+    public String getProviderId(){return providerId;}
+
+    public void setProviderId(String providerId){ this.providerId = providerId;}
+
+    public String getProvider(){return provider;}
+
+    public void setProvider(String provider){this.provider = provider;}
 
     @Override
     public boolean equals(Object o) {
@@ -184,6 +193,8 @@ public class User {
         if (birthDate != user.birthDate) return false;
         if (gender != null ? !gender.equals(user.gender) : user.gender != null) return false;
         if (Uid != null ? !Uid.equals(user.Uid) : user.Uid != null) return false;
+        if (providerId != null ? !providerId.equals(user.providerId) : user.providerId != null) return false;
+        if (provider != null ? !provider.equals(user.provider) : user.provider != null) return false;
         if (createDate != user.createDate) return false;
         return !(country != null ? !country.equals(user.country) : user.country != null);
 
@@ -208,6 +219,8 @@ public class User {
         result = 31 * result + (Uid != null ? Uid.hashCode() : 0);
         result = 31 * result + (gender != null ? gender.hashCode() : 0);
         result = 31 * result + (country != null ? country.hashCode() : 0);
+        result = 31 * result + (provider != null ? provider.hashCode() : 0);
+        result = 31 * result + (providerId != null ? providerId.hashCode() : 0);
         return result;
     }
 
@@ -230,6 +243,8 @@ public class User {
                 ", gender='" + gender + '\'' +
                 ", country='" + country + '\'' +
                 ", profileImageUrl='" + profileImageUrl + '\'' +
+                ", providerId='" + providerId + '\'' +
+                ", provider='" + provider + '\'' +
                 '}';
     }
 
@@ -250,5 +265,7 @@ public class User {
         this.setProfileImageUrl(user.profileImageUrl);
         this.setBirthDate(user.birthDate);
         this.setUid(user.Uid);
+        this.setProvider(user.provider);
+        this.setProviderId(user.providerId);
     }
 }

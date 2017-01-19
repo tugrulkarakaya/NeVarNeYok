@@ -371,7 +371,7 @@ public class AccountEditFragment extends Fragment {
                             if (progressDialog != null) progressDialog.cancel();
                             JSONObject json = new JSONObject();
                             try {
-                                json = new JSONObject(String.valueOf(R.string.Your_session_has_expired_Please_log_in_again));
+                                json = new JSONObject(getString(R.string.Your_session_has_expired_Please_log_in_again));
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
