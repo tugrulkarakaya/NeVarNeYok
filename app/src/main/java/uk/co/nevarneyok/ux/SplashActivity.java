@@ -38,6 +38,7 @@ import com.android.volley.VolleyError;
 import com.facebook.appevents.AppEventsLogger;
 import com.facebook.applinks.AppLinkData;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -331,6 +332,28 @@ public class SplashActivity extends AppCompatActivity {
      * Load available shops from server.
      */
     private void requestShops() {
+
+        ArrayList<Shop> shopList = new ArrayList<Shop>();
+        Shop ShopEn = new Shop();
+        ShopEn.setName("English");
+        ShopEn.setDescription("English");
+        ShopEn.setFlagIcon(R.drawable.flag_en);
+        ShopEn.setLanguage("en");
+
+        Shop ShopTr = new Shop();
+        ShopTr.setName("Turkçe");
+        ShopTr.setDescription("Uygulamayı Türkçe Kullan");
+        ShopTr.setFlagIcon(R.drawable.flag_tr);
+        ShopTr.setLanguage("tr");
+
+        shopList.add(ShopEn);
+        shopList.add(ShopTr);
+        setSpinShops(shopList);
+        if (progressDialog != null) progressDialog.cancel();
+        animateContentVisible();
+        return;
+/*
+
         if (layoutIntroScreen.getVisibility() != View.VISIBLE)
             progressDialog.show();
         GsonRequest<ShopResponse> getShopsRequest = new GsonRequest<>(Request.Method.GET, EndPoints.SHOPS, null, ShopResponse.class,
@@ -353,6 +376,7 @@ public class SplashActivity extends AppCompatActivity {
         getShopsRequest.setRetryPolicy(MyApplication.getDefaultRetryPolice());
         getShopsRequest.setShouldCache(false);
         MyApplication.getInstance().addToRequestQueue(getShopsRequest, CONST.SPLASH_REQUESTS_TAG);
+        */
     }
 
     /**
@@ -365,7 +389,7 @@ public class SplashActivity extends AppCompatActivity {
             // preset shop selection title.
             Shop defaultEmptyValue = new Shop();
             defaultEmptyValue.setId(CONST.DEFAULT_EMPTY_ID);
-            defaultEmptyValue.setName(getString(R.string.Select_shop));
+            defaultEmptyValue.setName(getString(R.string.select_language));
             shopList.add(0, defaultEmptyValue);
 
             ShopSpinnerAdapter shopSpinnerAdapter = new ShopSpinnerAdapter(this, shopList, true);

@@ -16,7 +16,7 @@ public class Shop {
     private String currency;
 
     @SerializedName("flag_icon")
-    private String flagIcon;
+    private Integer flagIcon;
 
     public Shop() {
     }
@@ -90,11 +90,11 @@ public class Shop {
         this.currency = currency;
     }
 
-    public String getFlagIcon() {
+    public Integer getFlagIcon() {
         return flagIcon;
     }
 
-    public void setFlagIcon(String flagIcon) {
+    public void setFlagIcon(Integer flagIcon) {
         this.flagIcon = flagIcon;
     }
 

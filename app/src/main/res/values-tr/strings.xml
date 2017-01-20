@@ -163,4 +163,5 @@
     <string name="menu_action_cart">Alışveriş sepeti</string>
     <string name="menu_action_search">Ara</string>
     <string name="menu_action_wishlist">İstek listesi</string>
+    <string name="select_language">Dil Seçin</string>
 </resources>
