@@ -335,6 +335,9 @@ public class SplashActivity extends AppCompatActivity {
 
         ArrayList<Shop> shopList = new ArrayList<Shop>();
         Shop ShopEn = new Shop();
+        ShopEn.setId(21);
+        ShopEn.setCurrency("USD");
+
         ShopEn.setName("English");
         ShopEn.setDescription("English");
         ShopEn.setFlagIcon(R.drawable.flag_en);
@@ -342,6 +345,8 @@ public class SplashActivity extends AppCompatActivity {
 
         Shop ShopTr = new Shop();
         ShopTr.setName("Turkçe");
+        ShopTr.setId(18);
+        ShopTr.setCurrency("TRY");
         ShopTr.setDescription("Uygulamayı Türkçe Kullan");
         ShopTr.setFlagIcon(R.drawable.flag_tr);
         ShopTr.setLanguage("tr");
@@ -352,8 +357,8 @@ public class SplashActivity extends AppCompatActivity {
         if (progressDialog != null) progressDialog.cancel();
         animateContentVisible();
         return;
-/*
 
+/*
         if (layoutIntroScreen.getVisibility() != View.VISIBLE)
             progressDialog.show();
         GsonRequest<ShopResponse> getShopsRequest = new GsonRequest<>(Request.Method.GET, EndPoints.SHOPS, null, ShopResponse.class,
@@ -376,7 +381,7 @@ public class SplashActivity extends AppCompatActivity {
         getShopsRequest.setRetryPolicy(MyApplication.getDefaultRetryPolice());
         getShopsRequest.setShouldCache(false);
         MyApplication.getInstance().addToRequestQueue(getShopsRequest, CONST.SPLASH_REQUESTS_TAG);
-        */
+*/
     }
 
     /**
