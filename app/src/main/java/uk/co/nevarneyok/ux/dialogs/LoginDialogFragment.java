@@ -392,7 +392,7 @@ public class LoginDialogFragment extends DialogFragment implements FacebookCallb
                             user.setName(fbUser.optString("name"));
                             user.setFbId(fbUser.optString("id"));
                             user.setProviderId(fbUser.optString("id"));
-
+                            user.setProvider(getString(R.string.providers_facebook));
                             user.setProfileImageUrl("https://graph.facebook.com/"+user.getProviderId()+"/picture?type=large");
                             final UserController userController = new UserController(user);
                             userController.saveAndRetrieveData(new UserController.completion() {
@@ -442,6 +442,7 @@ public class LoginDialogFragment extends DialogFragment implements FacebookCallb
                         }
                         final User user = new User(task.getResult().getUser().getUid());
                         user.setGender(loginRegistrationGenderWoman.isChecked() ? "female" : "male");
+                        user.setProvider(getString(R.string.providers_email));
                         UserController userController= new UserController(user);
                         userController.getAuthInfo();
                         userController.save(new UserController.FirebaseCallResult()
