@@ -68,7 +68,7 @@
     <string name="No_network_connection">Internet bağlantısı yok</string>
     <string name="Note">Not</string>
     <string name="Ok">Tamam</string>
-    <string name="Oops_login_expired">Aaah sistemden çıktınız</string>
+    <string name="Oops_login_expired">Oops oturumunuz sonlandı</string>
     <string name="Open_source_libraries">Açık kaynak kod kütüphaneler</string>
     <string name="Order">Sipariş</string>
     <string name="Order_colon">Sipariş:</string>
@@ -89,9 +89,9 @@
     <string name="Product_not_found">Ürün bulunamadı</string>
     <string name="Products_not_found">Ürünler bulunamadı</string>
     <string name="Profile">Hesap</string>
-    <string name="RECOMMENDED">ÖNERİLDİ</string>
+    <string name="RECOMMENDED">BENZER ÜRÜNLER</string>
     <string name="Receiving_facebook_profile_failed">Facebook profili getirilemedi</string>
-    <string name="Recommended">Önerildi</string>
+    <string name="Recommended">Benzer ürünler</string>
     <string name="Register">Kayıt ol</string>
     <string name="Required_field">Boş geçilemez</string>
     <string name="Reset">Sıfırla</string>
