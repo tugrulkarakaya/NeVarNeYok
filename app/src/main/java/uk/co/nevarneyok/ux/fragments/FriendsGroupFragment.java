@@ -50,7 +50,6 @@ public class FriendsGroupFragment extends Fragment {
         MainActivity.setActionBarTitle(getString(R.string.friends_group));
         View view = inflater.inflate(R.layout.fragment_friends_group, container, false);
         contactsListView = (RecyclerView) view.findViewById(R.id.friendgrouplist);
-        contactsListView.setHasFixedSize(true);
         contactsListView.setLayoutManager(new LinearLayoutManager(getContext()));
 
         if(activeUser!=null){

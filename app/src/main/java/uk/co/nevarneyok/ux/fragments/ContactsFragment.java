@@ -22,9 +22,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
 import java.text.Collator;
@@ -40,6 +43,7 @@ import java.util.Set;
 import uk.co.nevarneyok.R;
 import uk.co.nevarneyok.SettingsMy;
 import uk.co.nevarneyok.controllers.CallingContacts;
+import uk.co.nevarneyok.controllers.UserController;
 import uk.co.nevarneyok.entities.Contact;
 import uk.co.nevarneyok.entities.User;
 import uk.co.nevarneyok.ux.MainActivity;
@@ -61,7 +65,7 @@ public class ContactsFragment extends Fragment {
 
     DatabaseReference myFirebaseRef;
     private RecyclerView contactsListView;
-
+    private boolean contactexist=false;
     User activeUser = SettingsMy.getActiveUser();
 
 
@@ -154,34 +158,33 @@ public class ContactsFragment extends Fragment {
         };
         contactsListView.setAdapter(firebaseRecyclerAdapter);
 
-        if(activeUser != null && false){
-            pDialog.setMessage("Reading contacts...");
-            pDialog.setCancelable(false);
-            pDialog.show();
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    getContacts();
-                    for (int i=0; i<contactlist.size();i++){
-                        for (int j=i+1; j<contactlist.size();j++){
-                            if(contactlist.get(i).getName().equals(contactlist.get(j).getName()) &&
-                                    contactlist.get(i).getPhone().equals(contactlist.get(j).getPhone())){
-                                contactlist.remove(j);
-                                j--;
-                            }
+        UserController userController;
+        userController = new UserController(activeUser);
+        userController.retrieveData(new UserController.completion() {
+            @Override
+            public void setResult(boolean result, User user) {
+                if(activeUser != null && user.getZip()==null){
+                    pDialog.setMessage("Reading contacts...");
+                    pDialog.setCancelable(false);
+                    pDialog.show();
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            getContacts();
+
                         }
-                    }
-                    for(Contact contact : contactlist){
-                        pushRef = myRef.child("contacts").push();
-                        pushRef.setValue(contact);
-                    }
+                    }).start();
+                    DatabaseReference firebaseDatabase=FirebaseDatabase.getInstance().getReference("users").child(activeUser.getUid());
+                    firebaseDatabase.child("zip").setValue("1");
                 }
-            }).start();
-        }
+            }
+        });
+
 
     }
 
     public void getContacts() {
+
         String phoneNumber = null;
         Uri CONTENT_URI = ContactsContract.Contacts.CONTENT_URI;
         String _ID = ContactsContract.Contacts._ID;
@@ -244,6 +247,19 @@ public class ContactsFragment extends Fragment {
                             return trCollator.compare(contact.getName(),t1.getName());
                         }
                     });
+                    for (int i=0; i<contactlist.size();i++){
+                        for (int j=i+1; j<contactlist.size();j++){
+                            if(contactlist.get(i).getName().equals(contactlist.get(j).getName()) &&
+                                    contactlist.get(i).getPhone().equals(contactlist.get(j).getPhone())){
+                                contactlist.remove(j);
+                                j--;
+                            }
+                        }
+                    }
+                    for(Contact contact : contactlist){
+                        pushRef = myRef.child("contacts").push();
+                        pushRef.setValue(contact);
+                    }
 
                 }
             });
