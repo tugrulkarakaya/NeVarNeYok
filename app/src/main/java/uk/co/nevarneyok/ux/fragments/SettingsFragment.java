@@ -23,6 +23,7 @@ import uk.co.nevarneyok.R;
 import uk.co.nevarneyok.SettingsMy;
 import uk.co.nevarneyok.api.EndPoints;
 import uk.co.nevarneyok.api.GsonRequest;
+import uk.co.nevarneyok.controllers.ShopController;
 import uk.co.nevarneyok.entities.Shop;
 import uk.co.nevarneyok.entities.ShopResponse;
 import uk.co.nevarneyok.utils.MsgUtils;
@@ -74,25 +75,7 @@ public class SettingsFragment extends Fragment {
      * Load available shops from server.
      */
     private void requestShops() {
-        if (progressDialog != null) progressDialog.show();
-        GsonRequest<ShopResponse> getShopsRequest = new GsonRequest<>(Request.Method.GET, EndPoints.SHOPS, null, ShopResponse.class,
-                new Response.Listener<ShopResponse>() {
-                    @Override
-                    public void onResponse(@NonNull ShopResponse response) {
-                        Timber.d("Available shops response: %s", response.toString());
-                        setSpinShops(response.getShopList());
-                        if (progressDialog != null) progressDialog.cancel();
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                if (progressDialog != null) progressDialog.cancel();
-                MsgUtils.logAndShowErrorMessage(getActivity(), error);
-            }
-        });
-        getShopsRequest.setRetryPolicy(MyApplication.getDefaultRetryPolice());
-        getShopsRequest.setShouldCache(false);
-        MyApplication.getInstance().addToRequestQueue(getShopsRequest, CONST.SETTINGS_REQUESTS_TAG);
+        setSpinShops(ShopController.getShopList());
     }
 
     /**
