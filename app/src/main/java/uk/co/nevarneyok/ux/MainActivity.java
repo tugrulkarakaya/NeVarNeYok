@@ -25,6 +25,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.BaseColumns;
+import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
@@ -85,7 +86,9 @@ import uk.co.nevarneyok.ux.fragments.AccountFragment;
 import uk.co.nevarneyok.ux.fragments.BannersFragment;
 import uk.co.nevarneyok.ux.fragments.CartFragment;
 import uk.co.nevarneyok.ux.fragments.CategoryFragment;
+import uk.co.nevarneyok.ux.fragments.ContactsFragment;
 import uk.co.nevarneyok.ux.fragments.DrawerFragment;
+import uk.co.nevarneyok.ux.fragments.FriendsGroupFragment;
 import uk.co.nevarneyok.ux.fragments.OrderCreateFragment;
 import uk.co.nevarneyok.ux.fragments.OrderFragment;
 import uk.co.nevarneyok.ux.fragments.OrdersHistoryFragment;
@@ -323,7 +326,8 @@ public class MainActivity extends AppCompatActivity implements DrawerFragment.Fr
         view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                onCartSelected();
+//                onCartSelected();
+                replaceFragment(new ContactsFragment(),ContactsFragment.class.getSimpleName());
             }
         });
         if (cartCountNotificationValue == CONST.DEFAULT_EMPTY_ID) {
@@ -527,10 +531,12 @@ public class MainActivity extends AppCompatActivity implements DrawerFragment.Fr
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_wish_list) {
-            onWishlistSelected();
+            //onWishlistSelected();
+            replaceFragment(new FriendsGroupFragment(),FriendsGroupFragment.class.getSimpleName());
             return true;
         } else if (id == R.id.action_cart) {
-            onCartSelected();
+//            onCartSelected();
+            replaceFragment(new ContactsFragment(),ContactsFragment.class.getSimpleName());
             return true;
         }
 
@@ -542,7 +548,8 @@ public class MainActivity extends AppCompatActivity implements DrawerFragment.Fr
      * When fragment stack is cleared {@link #clearBackStack}, this fragment will be shown.
      */
     private void addInitialFragment() {
-        Fragment fragment = new BannersFragment();
+//        Fragment fragment = new BannersFragment();
+        Fragment fragment = new ContactsFragment();
         FragmentManager frgManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = frgManager.beginTransaction();
         fragmentTransaction.add(R.id.main_content_frame, fragment).commit();
@@ -606,7 +613,12 @@ public class MainActivity extends AppCompatActivity implements DrawerFragment.Fr
         if (f == null || !(f instanceof BannersFragment)) {
             Fragment fragment = new BannersFragment();
             replaceFragment(fragment, BannersFragment.class.getSimpleName());
-        } else {
+        }
+//        if(f==null || !(f instanceof ContactsFragment)){
+//            Fragment fragment = new ContactsFragment();
+//            replaceFragment(fragment, ContactsFragment.class.getSimpleName());
+//        }
+        else {
             Timber.d("Banners already displayed.");
         }
     }

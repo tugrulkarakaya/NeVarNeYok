@@ -73,7 +73,6 @@ public class BannersFragment extends Fragment {
         if ((savedInstanceState == null && !mAlreadyLoaded) || bannersRecyclerAdapter == null || bannersRecyclerAdapter.isEmpty()) {
             Timber.d("Reloading banners.");
             mAlreadyLoaded = true;
-
             // Prepare views and listeners
             prepareContentViews(view, true);
             loadBanners(null);

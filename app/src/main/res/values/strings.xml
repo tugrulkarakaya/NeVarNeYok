@@ -203,4 +203,9 @@
     <string name="content_description_product_image">Product image</string>
     <string name="content_description_shipping_info">Shipping info</string>
     <string name="select_language">Select Language</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="Contact_List">Contact List</string>
+    <string name="friends_group">Friends Group</string>
 </resources>
