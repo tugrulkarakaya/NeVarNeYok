@@ -48,6 +48,7 @@ import uk.co.nevarneyok.R;
 import uk.co.nevarneyok.SettingsMy;
 import uk.co.nevarneyok.api.EndPoints;
 import uk.co.nevarneyok.api.GsonRequest;
+import uk.co.nevarneyok.controllers.ShopController;
 import uk.co.nevarneyok.entities.Shop;
 import uk.co.nevarneyok.entities.ShopResponse;
 import uk.co.nevarneyok.testing.EspressoIdlingResource;
@@ -332,56 +333,9 @@ public class SplashActivity extends AppCompatActivity {
      * Load available shops from server.
      */
     private void requestShops() {
-
-        ArrayList<Shop> shopList = new ArrayList<Shop>();
-        Shop ShopEn = new Shop();
-        ShopEn.setId(21);
-        ShopEn.setCurrency("USD");
-
-        ShopEn.setName("English");
-        ShopEn.setDescription("English");
-        ShopEn.setFlagIcon(R.drawable.flag_en);
-        ShopEn.setLanguage("en");
-
-        Shop ShopTr = new Shop();
-        ShopTr.setName("Turkçe");
-        ShopTr.setId(18);
-        ShopTr.setCurrency("TRY");
-        ShopTr.setDescription("Uygulamayı Türkçe Kullan");
-        ShopTr.setFlagIcon(R.drawable.flag_tr);
-        ShopTr.setLanguage("tr");
-
-        shopList.add(ShopEn);
-        shopList.add(ShopTr);
-        setSpinShops(shopList);
+        setSpinShops(ShopController.getShopList());
         if (progressDialog != null) progressDialog.cancel();
         animateContentVisible();
-        return;
-
-/*
-        if (layoutIntroScreen.getVisibility() != View.VISIBLE)
-            progressDialog.show();
-        GsonRequest<ShopResponse> getShopsRequest = new GsonRequest<>(Request.Method.GET, EndPoints.SHOPS, null, ShopResponse.class,
-                new Response.Listener<ShopResponse>() {
-                    @Override
-                    public void onResponse(@NonNull ShopResponse response) {
-                        Timber.d("Get shops response: %s", response.toString());
-                        setSpinShops(response.getShopList());
-                        if (progressDialog != null) progressDialog.cancel();
-                        animateContentVisible();
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                if (progressDialog != null) progressDialog.cancel();
-                MsgUtils.logAndShowErrorMessage(activity, error);
-                finish();
-            }
-        });
-        getShopsRequest.setRetryPolicy(MyApplication.getDefaultRetryPolice());
-        getShopsRequest.setShouldCache(false);
-        MyApplication.getInstance().addToRequestQueue(getShopsRequest, CONST.SPLASH_REQUESTS_TAG);
-*/
     }
 
     /**
