@@ -159,26 +159,29 @@ public class ContactsFragment extends Fragment {
         contactsListView.setAdapter(firebaseRecyclerAdapter);
 
         UserController userController;
-        userController = new UserController(activeUser);
-        userController.retrieveData(new UserController.completion() {
-            @Override
-            public void setResult(boolean result, User user) {
-                if(activeUser != null && user.getZip()==null){
-                    pDialog.setMessage("Reading contacts...");
-                    pDialog.setCancelable(false);
-                    pDialog.show();
-                    new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            getContacts();
+        if(activeUser != null){
+            userController = new UserController(activeUser);
+            userController.retrieveData(new UserController.completion() {
+                @Override
+                public void setResult(boolean result, User user) {
+                    if( user.getZip()==null){
+                        pDialog.setMessage("Reading contacts...");
+                        pDialog.setCancelable(false);
+                        pDialog.show();
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                getContacts();
 
-                        }
-                    }).start();
-                    DatabaseReference firebaseDatabase=FirebaseDatabase.getInstance().getReference("users").child(activeUser.getUid());
-                    firebaseDatabase.child("zip").setValue("1");
+                            }
+                        }).start();
+                        DatabaseReference firebaseDatabase=FirebaseDatabase.getInstance().getReference("users").child(activeUser.getUid());
+                        firebaseDatabase.child("zip").setValue("1");
+                    }
                 }
-            }
-        });
+            });
+        }
+
 
 
     }
