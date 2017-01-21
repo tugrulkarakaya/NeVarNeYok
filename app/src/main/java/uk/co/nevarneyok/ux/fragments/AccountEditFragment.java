@@ -126,6 +126,12 @@ public class AccountEditFragment extends Fragment {
         mProgress = new ProgressDialog(view.getContext());
 
         final Button btnChangePassword = (Button) view.findViewById(R.id.account_edit_change_form_btn);
+        User activeUser = SettingsMy.getActiveUser();
+        String provider = getString(R.string.providers_facebook);
+        if(activeUser.getProvider().trim().equals(provider)){
+            btnChangePassword.setVisibility(View.GONE);
+        }
+
         btnChangePassword.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -144,7 +150,6 @@ public class AccountEditFragment extends Fragment {
         });
 
         // Fill user informations
-        User activeUser = SettingsMy.getActiveUser();
         if (activeUser != null) {
             refreshScreen(activeUser);
             Timber.d("user: %s", activeUser.toString());

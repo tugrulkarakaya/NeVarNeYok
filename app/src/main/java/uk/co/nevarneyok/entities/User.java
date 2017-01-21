@@ -9,6 +9,7 @@ import android.support.annotation.RequiresApi;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.gson.annotations.SerializedName;
 
+import java.sql.Struct;
 import java.util.Date;
 import java.util.Objects;
 
