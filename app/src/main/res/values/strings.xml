@@ -210,4 +210,10 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="Contact_List">Contact List</string>
     <string name="friends_group">Friends Group</string>
+    <string name="endCall1">End call</string>
+    <string name="archivingOff">Archiving off</string>
+    <string name="archivingOn">Archiving on</string>
+    <string name="menu_settings">Settings</string>
+    <string name="notification">Ongoing call</string>
+    <string name="audioOnly">Audio only</string>
 </resources>
