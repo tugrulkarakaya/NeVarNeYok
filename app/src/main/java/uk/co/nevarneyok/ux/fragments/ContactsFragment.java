@@ -65,7 +65,6 @@ public class ContactsFragment extends Fragment {
 
     DatabaseReference myFirebaseRef;
     private RecyclerView contactsListView;
-    private boolean contactexist=false;
     User activeUser = SettingsMy.getActiveUser();
 
 
@@ -160,11 +159,10 @@ public class ContactsFragment extends Fragment {
 
         UserController userController;
         if(activeUser != null){
-            userController = new UserController(activeUser);
-            userController.retrieveData(new UserController.completion() {
+            callingContacts.existsData(new CallingContacts.completion() {
                 @Override
-                public void setResult(boolean result, User user) {
-                    if( user.getZip()==null){
+                public void setResult(boolean result) {
+                    if(!result){
                         pDialog.setMessage("Reading contacts...");
                         pDialog.setCancelable(false);
                         pDialog.show();
@@ -175,8 +173,6 @@ public class ContactsFragment extends Fragment {
 
                             }
                         }).start();
-                        DatabaseReference firebaseDatabase=FirebaseDatabase.getInstance().getReference("users").child(activeUser.getUid());
-                        firebaseDatabase.child("zip").setValue("1");
                     }
                 }
             });
