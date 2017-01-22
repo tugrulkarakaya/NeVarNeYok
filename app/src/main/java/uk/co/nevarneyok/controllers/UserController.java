@@ -1,12 +1,14 @@
 package uk.co.nevarneyok.controllers;
 
+import android.content.Context;
 import android.net.Uri;
 
-import com.google.firebase.auth.FirebaseAuth;
-
+import uk.co.nevarneyok.MyApplication;
+import uk.co.nevarneyok.R;
 import uk.co.nevarneyok.SettingsMy;
 import uk.co.nevarneyok.api.FIRDataServices;
 import uk.co.nevarneyok.entities.User;
+import uk.co.nevarneyok.utils.MsgUtils;
 import uk.co.nevarneyok.ux.MainActivity;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -18,7 +20,7 @@ import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
 
 
-public class UserController {
+public class UserController  {
     public interface FirebaseCallResult{
         void onComplete(boolean result);
     }
@@ -40,42 +42,30 @@ public class UserController {
     }
 
     public UserController(User user){
+        super();
         this.user = user;
+
     }
 
-
-    public void isUserRecorded(final completion callResult ){
-        getFirReference().addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                if(dataSnapshot.exists()){
-                    callResult.setResult(true, user);
-                } else{
-                    callResult.setResult(false, user);
-                }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-    }
-    public void save(final FirebaseCallResult callResult){
-        getFirReference().setValue(this.user, new DatabaseReference.CompletionListener() {
-                    @Override
-                    public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
-                        if(databaseError == null) {
-                            if (user.getCreateDate() == 0) {
-                                getFirReference().child("createDate").setValue(ServerValue.TIMESTAMP);
+    public void save(final FirebaseCallResult callResult) {
+        try {
+            getFirReference().setValue(this.user, new DatabaseReference.CompletionListener() {
+                        @Override
+                        public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
+                            if (databaseError == null) {
+                                if (user.getCreateDate() == 0) {
+                                    getFirReference().child("createDate").setValue(ServerValue.TIMESTAMP);
+                                }
+                                callResult.onComplete(true);
+                            } else {
+                                callResult.onComplete(false);
                             }
-                            callResult.onComplete(true);
-                        }else{
-                            callResult.onComplete(false);
                         }
                     }
-                }
-        );
+            );
+        } catch(Exception e){
+                //MsgUtils.showToast(getParent(),MsgUtils.TOAST_TYPE_INTERNAL_ERROR, getString(R.string.Sign_out_error),MsgUtils.ToastLength.SHORT);
+        }
     }
 
     public void getAuthInfo(){
@@ -124,27 +114,37 @@ public class UserController {
     }
 
     public void retrieveData(final completion callResult) {
-        getFirReference().addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                if (dataSnapshot.exists()) {
-                    user = dataSnapshot.getValue(User.class);
-                    callResult.setResult(true, user);
-                } else {
+        try{
+            getFirReference().addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    if (dataSnapshot.exists()) {
+                        user = dataSnapshot.getValue(User.class);
+                        callResult.setResult(true, user);
+                    } else {
+                        callResult.setResult(false, user);
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
                     callResult.setResult(false, user);
                 }
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                callResult.setResult(false, user);
-            }
-        });
+            });
+        }
+        catch(Exception e){
+            MsgUtils.showToast(R.string.Sign_out_error, MsgUtils.TOAST_TYPE_MESSAGE, MsgUtils.ToastLength.LONG);
+        }
     }
 
     public static void signOut(){
-        FirebaseAuth.getInstance().signOut();
-        SettingsMy.setActiveUser(null);
-        MainActivity.invalidateDrawerMenuHeader();
+        try {
+            FirebaseAuth.getInstance().signOut();
+            SettingsMy.setActiveUser(null);
+            MainActivity.invalidateDrawerMenuHeader();
+        } catch(Exception ex){
+            MsgUtils.showToast(R.string.Sign_out_error, MsgUtils.TOAST_TYPE_MESSAGE, MsgUtils.ToastLength.LONG);
+        }
+
     }
 }

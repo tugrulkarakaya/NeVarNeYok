@@ -49,6 +49,7 @@ import uk.co.nevarneyok.SettingsMy;
 import uk.co.nevarneyok.api.EndPoints;
 import uk.co.nevarneyok.api.GsonRequest;
 import uk.co.nevarneyok.controllers.ShopController;
+import uk.co.nevarneyok.controllers.UserController;
 import uk.co.nevarneyok.entities.Shop;
 import uk.co.nevarneyok.entities.ShopResponse;
 import uk.co.nevarneyok.testing.EspressoIdlingResource;
@@ -67,6 +68,7 @@ import timber.log.Timber;
 public class SplashActivity extends AppCompatActivity {
     public static final String REFERRER = "referrer";
     private static final String TAG = SplashActivity.class.getSimpleName();
+    protected MyApplication mMyApplication;
 
     private Activity activity;
     private ProgressDialog progressDialog;
@@ -100,8 +102,10 @@ public class SplashActivity extends AppCompatActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mMyApplication = (MyApplication) this.getApplicationContext();
         Timber.tag(TAG);
         activity = this;
+        mMyApplication.setCurrentActivity(this);
 
         // init loading dialog
         progressDialog = Utils.generateProgressDialog(this, false);
@@ -218,7 +222,11 @@ public class SplashActivity extends AppCompatActivity {
                                 // Logout user if shop changed
                                 Shop actualShop = SettingsMy.getActualShop();
                                 if (actualShop != null && shop.getId() != actualShop.getId())
-                                    LoginDialogFragment.logoutUser();
+                                    try{
+                                        UserController.signOut();
+                                    } catch(Exception e){
+                                        MsgUtils.showToast(getParent(),MsgUtils.TOAST_TYPE_INTERNAL_ERROR, getString(R.string.Sign_out_error),MsgUtils.ToastLength.SHORT);
+                                    }
 
                                 setShopInformationAndStartMainActivity(shop, bundle);
                             }
@@ -455,7 +463,7 @@ public class SplashActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-
+        mMyApplication.setCurrentActivity(this);
         // Logs 'install' and 'app activate' App Events.
         AppEventsLogger.activateApp(this);
     }
@@ -463,11 +471,16 @@ public class SplashActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-
+        clearReferences();
         // Logs 'app deactivate' App Event.
         AppEventsLogger.deactivateApp(this);
     }
 
+    private void clearReferences(){
+        Activity currActivity = mMyApplication.getCurrentActivity();
+        if (this.equals(currActivity))
+            mMyApplication.setCurrentActivity(null);
+    }
     @Override
     protected void onStop() {
         if (progressDialog != null) progressDialog.cancel();
@@ -488,4 +501,10 @@ public class SplashActivity extends AppCompatActivity {
         windowDetached = true;
         super.onDetachedFromWindow();
     }
+
+    protected void onDestroy() {
+        clearReferences();
+        super.onDestroy();
+    }
+
 }

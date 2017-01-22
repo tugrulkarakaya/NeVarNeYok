@@ -132,8 +132,13 @@ public class AccountFragment extends Fragment {
             @Override
             public void onSingleClick(View v) {
                 if (SettingsMy.getActiveUser() != null) {
-                    LoginDialogFragment.logoutUser();
-                    refreshScreen(null);
+                    try{
+                        UserController.signOut();
+                        refreshScreen(null);
+                    } catch(Exception e){
+                        MsgUtils.showToast(getActivity(),MsgUtils.TOAST_TYPE_INTERNAL_ERROR, getString(R.string.Sign_out_error),MsgUtils.ToastLength.SHORT);
+                    }
+
                 } else {
                     LoginDialogFragment loginDialogFragment = LoginDialogFragment.newInstance(new LoginDialogInterface() {
                         @Override

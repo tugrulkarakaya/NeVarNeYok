@@ -1,5 +1,6 @@
 package uk.co.nevarneyok;
 
+import android.app.Activity;
 import android.app.Application;
 import android.content.Context;
 import android.content.pm.PackageInfo;
@@ -41,11 +42,17 @@ public class MyApplication extends Application {
 
     private RequestQueue mRequestQueue;
 
+    private static Context context;
+
+    private Activity mCurrentActivity = null;
 
     public static synchronized MyApplication getInstance() {
         return mInstance;
     }
 
+    public static Context getAppContext() {
+        return MyApplication.context;
+    }
 
     /**
      * Method sets app specific language localization by selected shop.
@@ -74,11 +81,19 @@ public class MyApplication extends Application {
         return new DefaultRetryPolicy(14000, 2, 1);
     }
 
+    public Activity getCurrentActivity(){
+        return mCurrentActivity;
+    }
+    public void setCurrentActivity(Activity mCurrentActivity){
+        this.mCurrentActivity = mCurrentActivity;
+    }
+
     @Override
     public void onCreate() {
         super.onCreate();
         mInstance = this;
         FacebookSdk.sdkInitialize(this);
+        MyApplication.context = getApplicationContext();
 
         if (BuildConfig.DEBUG) {
             Timber.plant(new Timber.DebugTree());

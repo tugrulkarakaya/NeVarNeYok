@@ -117,11 +117,6 @@ public class LoginDialogFragment extends DialogFragment implements FacebookCallb
         return frag;
     }
 
-    public static void logoutUser() {
-        //TODO TUGRUL tarafından düzenlendi.
-        UserController.signOut();
-    }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -402,7 +397,11 @@ public class LoginDialogFragment extends DialogFragment implements FacebookCallb
                                         Timber.d(MSG_RESPONSE, user.toString());
                                         handleUserLogin(user);
                                     } else{
-                                        userController.signOut();
+                                        try{
+                                            userController.signOut();
+                                        } catch(Exception e){
+                                            MsgUtils.showToast(getActivity(),MsgUtils.TOAST_TYPE_INTERNAL_ERROR, getString(R.string.Sign_out_error),MsgUtils.ToastLength.SHORT);
+                                        }
                                         if (progressDialog != null) progressDialog.cancel();
                                         MsgUtils.showToast(getActivity(), MsgUtils.TOAST_TYPE_MESSAGE, null, MsgUtils.ToastLength.LONG);
                                     }
@@ -495,9 +494,18 @@ public class LoginDialogFragment extends DialogFragment implements FacebookCallb
                                         Timber.d(MSG_RESPONSE, user.toString());
                                         handleUserLogin(user);
                                     } else{
-                                        userController.signOut();
-                                        if (progressDialog != null) progressDialog.cancel();
-                                        MsgUtils.showToast(getActivity(), MsgUtils.TOAST_TYPE_MESSAGE, null, MsgUtils.ToastLength.LONG);
+                                        try{
+                                            try{
+                                                UserController.signOut();
+                                            } catch(Exception e){
+                                                MsgUtils.showToast(getActivity(),MsgUtils.TOAST_TYPE_INTERNAL_ERROR, getString(R.string.Sign_out_error),MsgUtils.ToastLength.SHORT);
+                                            }
+                                            if (progressDialog != null) progressDialog.cancel();
+                                            MsgUtils.showToast(getActivity(), MsgUtils.TOAST_TYPE_MESSAGE, null, MsgUtils.ToastLength.LONG);
+                                        } catch(Exception e){
+                                            MsgUtils.showToast(getActivity(),MsgUtils.TOAST_TYPE_INTERNAL_ERROR, getString(R.string.Sign_out_error),MsgUtils.ToastLength.SHORT);
+                                        }
+
                                     }
                                 }
                             });
@@ -733,7 +741,11 @@ public class LoginDialogFragment extends DialogFragment implements FacebookCallb
             public void onErrorResponse(VolleyError error) {
                 if (progressDialog != null) progressDialog.cancel();
                 MsgUtils.logAndShowErrorMessage(getActivity(), error);
-                LoginDialogFragment.logoutUser();
+                try{
+                    UserController.signOut();
+                } catch(Exception e){
+                    MsgUtils.showToast(getActivity(),MsgUtils.TOAST_TYPE_INTERNAL_ERROR, getString(R.string.Sign_out_error),MsgUtils.ToastLength.SHORT);
+                }
             }
         }, getFragmentManager(), null);
         verifyFbUser.setRetryPolicy(MyApplication.getDefaultRetryPolice());
@@ -747,7 +759,11 @@ public class LoginDialogFragment extends DialogFragment implements FacebookCallb
      */
     private void handleNonFatalError(String message, boolean logoutFromFb) {
         if (logoutFromFb) {
-            LoginDialogFragment.logoutUser();
+            try{
+                UserController.signOut();
+            } catch(Exception e){
+                MsgUtils.showToast(getActivity(),MsgUtils.TOAST_TYPE_INTERNAL_ERROR, getString(R.string.Sign_out_error),MsgUtils.ToastLength.SHORT);
+            }
         }
         if (getActivity() != null)
             MsgUtils.showToast(getActivity(), MsgUtils.TOAST_TYPE_MESSAGE, message, MsgUtils.ToastLength.LONG);

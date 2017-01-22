@@ -13,6 +13,7 @@ import com.android.volley.VolleyError;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import uk.co.nevarneyok.MyApplication;
 import uk.co.nevarneyok.R;
 import timber.log.Timber;
 
@@ -66,6 +67,18 @@ public class MsgUtils {
                 MsgUtils.showToast(activity, TOAST_TYPE_INTERNAL_ERROR, null, ToastLength.SHORT);
         }
     }
+
+    public static void showToast(int resourceId, int toastType, ToastLength toastLength){
+        String message = MyApplication.getAppContext().getString(resourceId);
+        showToast(message, toastType, toastLength);
+    }
+
+    public static void showToast(String message, int toastType, ToastLength toastLength){
+        Activity    activity = ((MyApplication)(MyApplication.getAppContext()).getApplicationContext()).getCurrentActivity();
+        showToast(activity,toastType, message, toastLength);
+    }
+
+
 
     /**
      * Show custom Toast Message.

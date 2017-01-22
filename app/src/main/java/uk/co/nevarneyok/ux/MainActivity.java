@@ -15,6 +15,7 @@
  *******************************************************************************/
 package uk.co.nevarneyok.ux;
 
+import android.app.Activity;
 import android.app.SearchManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -136,6 +137,7 @@ public class MainActivity extends AppCompatActivity implements DrawerFragment.Fr
 
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
+    protected MyApplication mMyApplication;
 
     /**
      * Refresh notification number of products in shopping cart.
@@ -204,7 +206,8 @@ public class MainActivity extends AppCompatActivity implements DrawerFragment.Fr
         super.onCreate(savedInstanceState);
         mInstance = this;
         mAuth = FirebaseAuth.getInstance();
-
+        mMyApplication = (MyApplication)this.getApplicationContext();
+        mMyApplication.setCurrentActivity(this);
 
         Timber.d("%s onCreate", MainActivity.class.getSimpleName());
 
@@ -566,6 +569,7 @@ public class MainActivity extends AppCompatActivity implements DrawerFragment.Fr
         if (newFragment != null) {
             FragmentManager frgManager = getSupportFragmentManager();
             FragmentTransaction fragmentTransaction = frgManager.beginTransaction();
+            fragmentTransaction.setAllowOptimization(false);
             fragmentTransaction.addToBackStack(transactionTag);
             fragmentTransaction.replace(R.id.main_content_frame, newFragment).commit();
             frgManager.executePendingTransactions();
@@ -587,7 +591,7 @@ public class MainActivity extends AppCompatActivity implements DrawerFragment.Fr
                 }
             }
             FragmentManager.BackStackEntry first = manager.getBackStackEntryAt(0);
-            manager.popBackStack(first.getId(), FragmentManager.POP_BACK_STACK_INCLUSIVE);
+            manager.popBackStackImmediate(first.getId(), FragmentManager.POP_BACK_STACK_INCLUSIVE);
         }
         Timber.d("backStack cleared.");
 //        TODO maybe implement own fragment backStack handling to prevent banner fragment recreation during clearing.
@@ -827,6 +831,7 @@ public class MainActivity extends AppCompatActivity implements DrawerFragment.Fr
     @Override
     protected void onResume() {
         super.onResume();
+        mMyApplication.setCurrentActivity(this);
         // FB base events logging
         AppEventsLogger.activateApp(this);
 
@@ -838,11 +843,23 @@ public class MainActivity extends AppCompatActivity implements DrawerFragment.Fr
     @Override
     protected void onPause() {
         super.onPause();
+        clearReferences();
         // FB base events logging
         AppEventsLogger.deactivateApp(this);
         MyApplication.getInstance().cancelPendingRequests(CONST.MAIN_ACTIVITY_REQUESTS_TAG);
 
         // GCM registration
         LocalBroadcastManager.getInstance(this).unregisterReceiver(mRegistrationBroadcastReceiver);
+    }
+
+    protected void onDestroy() {
+        clearReferences();
+        super.onDestroy();
+    }
+
+    private void clearReferences(){
+        Activity currActivity = mMyApplication.getCurrentActivity();
+        if (this.equals(currActivity))
+            mMyApplication.setCurrentActivity(null);
     }
 }

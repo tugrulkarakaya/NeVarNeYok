@@ -20,6 +20,7 @@ import java.util.Map;
 import uk.co.nevarneyok.BuildConfig;
 import uk.co.nevarneyok.CONST;
 import uk.co.nevarneyok.MyApplication;
+import uk.co.nevarneyok.controllers.UserController;
 import uk.co.nevarneyok.ux.dialogs.LoginDialogFragment;
 import uk.co.nevarneyok.ux.dialogs.LoginExpiredDialogFragment;
 import timber.log.Timber;
@@ -111,7 +112,7 @@ public class JsonRequest extends JsonObjectRequest {
 
             // If AccessToken expired. Logout user and redirect to home page.
             if (getStatusCode() == HttpURLConnection.HTTP_FORBIDDEN && fragmentManager != null) {
-                LoginDialogFragment.logoutUser();
+                UserController.signOut();
                 DialogFragment loginExpiredDialogFragment = new LoginExpiredDialogFragment();
                 loginExpiredDialogFragment.show(fragmentManager, LoginExpiredDialogFragment.class.getSimpleName());
             }

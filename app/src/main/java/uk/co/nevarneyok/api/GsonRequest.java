@@ -159,9 +159,13 @@ public class GsonRequest<T> extends Request<T> {
             // If AccessToken expired. Logout user and redirect to home page.
             //TODO TUGRUL Move this block to firebase logout part or related locaiton
             if (getStatusCode() == HttpURLConnection.HTTP_FORBIDDEN && fragmentManager != null) {
-                UserController.signOut();
-                DialogFragment loginExpiredDialogFragment = new LoginExpiredDialogFragment();
-                loginExpiredDialogFragment.show(fragmentManager, LoginExpiredDialogFragment.class.getSimpleName());
+                try{
+                    UserController.signOut();
+                }catch(Exception e){
+                    DialogFragment loginExpiredDialogFragment = new LoginExpiredDialogFragment();
+                    loginExpiredDialogFragment.show(fragmentManager, LoginExpiredDialogFragment.class.getSimpleName());
+                }
+
             }
         } else {
             requestStatusCode = CONST.MissingStatusCode;
