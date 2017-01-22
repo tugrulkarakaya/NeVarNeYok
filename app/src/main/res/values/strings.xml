@@ -212,4 +212,10 @@
     <string name="friends_group">Friends Group</string>
     <string name="Sign_out_error">An error occured during sign out process</string>
     <string name="data_retrieve_error">Error occured during data retrieval</string>
+    <string name="endCall1">End call</string>
+    <string name="archivingOff">Archiving off</string>
+    <string name="archivingOn">Archiving on</string>
+    <string name="menu_settings">Settings</string>
+    <string name="notification">Ongoing call</string>
+    <string name="audioOnly">Audio only</string>
 </resources>
