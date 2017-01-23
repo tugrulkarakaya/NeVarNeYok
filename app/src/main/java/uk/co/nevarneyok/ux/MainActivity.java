@@ -99,6 +99,11 @@ import uk.co.nevarneyok.ux.fragments.SettingsFragment;
 import uk.co.nevarneyok.ux.fragments.WishlistFragment;
 import timber.log.Timber;
 
+import io.fabric.sdk.android.*;
+import com.twitter.sdk.android.core.*;
+import com.digits.sdk.android.*;
+
+
 import static com.android.volley.VolleyLog.TAG;
 
 /**
@@ -208,6 +213,7 @@ public class MainActivity extends AppCompatActivity implements DrawerFragment.Fr
         mAuth = FirebaseAuth.getInstance();
         mMyApplication = (MyApplication)this.getApplicationContext();
         mMyApplication.setCurrentActivity(this);
+
 
         Timber.d("%s onCreate", MainActivity.class.getSimpleName());
 

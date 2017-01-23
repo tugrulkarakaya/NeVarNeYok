@@ -1,4 +1,14 @@
+buildscript {
+    repositories {
+        maven { url 'https://maven.fabric.io/public' }
+    }
+
+    dependencies {
+        classpath 'io.fabric.tools:gradle:1.+'
+    }
+}
 apply plugin: 'com.android.application'
+apply plugin: 'io.fabric'
 
 android {
     compileSdkVersion 25
@@ -84,7 +94,10 @@ task clearData(type: Exec) {
     commandLine clearDataCommand
 }
 
-repositories { mavenCentral() }
+repositories {
+    mavenCentral()
+    maven { url 'https://maven.fabric.io/public' }
+}
 
 dependencies {
     //  if needed jar libraries, add them to libs folder and load them here:
@@ -93,6 +106,7 @@ dependencies {
     //// Unit testing dependencies
     // Set this dependency if you want to use the Hamcrest matcher library
     //// Instrumentation test dependencies
+
 
     compile 'com.android.support:appcompat-v7:25.1.0'
     compile 'com.android.support:design:25.1.0'
@@ -125,6 +139,7 @@ dependencies {
     androidTestCompile 'com.android.support.test:rules:0.5'
     androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.2'
     androidTestCompile 'com.android.support.test.espresso:espresso-intents:2.2.2'
+    compile('com.digits.sdk.android:digits:2.0.5@aar') {transitive = true;}
 }
 
 apply plugin: 'com.google.gms.google-services'

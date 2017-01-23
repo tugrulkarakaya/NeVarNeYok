@@ -134,5 +134,9 @@
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/android_key"/>
+        <!-- SMS Validation-->
+        <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="bdb0335ace81948d4f84d25d04a147b79b739d20" />
     </application>
 </manifest>

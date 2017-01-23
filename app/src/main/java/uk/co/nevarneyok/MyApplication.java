@@ -18,8 +18,12 @@ import com.android.volley.DefaultRetryPolicy;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
+import com.digits.sdk.android.Digits;
 import com.facebook.FacebookSdk;
 
+import com.twitter.sdk.android.core.TwitterAuthConfig;
+import com.twitter.sdk.android.core.TwitterCore;
+import io.fabric.sdk.android.Fabric;
 import java.util.Locale;
 
 import uk.co.nevarneyok.api.OkHttpStack;
@@ -30,6 +34,11 @@ import timber.log.Timber;
  * Created by petr.melicherik.
  */
 public class MyApplication extends Application {
+
+    // Note: Your consumer key and secret should be obfuscated in your source code before shipping.
+    private static final String TWITTER_KEY = "97EP0Btkp1BRRmiEbDsiEHUa9";
+    private static final String TWITTER_SECRET = "TOk47yCobSb8h76HDrNR6ApUZeWn8jB0XyiApPmrasV3jI5z19";
+
     public static final String PACKAGE_NAME = MyApplication.class.getPackage().getName();
 
     private static final String TAG = MyApplication.class.getSimpleName();
@@ -91,6 +100,8 @@ public class MyApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        TwitterAuthConfig authConfig = new TwitterAuthConfig(TWITTER_KEY, TWITTER_SECRET);
+        Fabric.with(this, new TwitterCore(authConfig), new Digits.Builder().build());
         mInstance = this;
         FacebookSdk.sdkInitialize(this);
         MyApplication.context = getApplicationContext();
