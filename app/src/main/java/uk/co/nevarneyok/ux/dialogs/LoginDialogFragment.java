@@ -78,6 +78,7 @@ import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.gson.JsonNull;
 
+import static android.content.ContentValues.TAG;
 import static com.android.volley.VolleyLog.TAG;
 import static com.facebook.FacebookSdk.getApplicationContext;
 
@@ -354,20 +355,24 @@ public class LoginDialogFragment extends DialogFragment implements FacebookCallb
         LoginManager.getInstance().registerCallback(callbackManager, this);
         LoginManager.getInstance().logInWithReadPermissions(this, Arrays.asList("public_profile", "email"));
     }
+
     private void handleFacebookAccessToken(final AccessToken token) {
+        try {
+            //facebook service to get user info
+            GraphRequest request = GraphRequest.newMeRequest(token, new GraphRequest.GraphJSONObjectCallback() {
+                @Override
+                public void onCompleted(JSONObject fbUser, GraphResponse graphResponse) {
+                    firebaseAccessCheck(token, fbUser);
+                }
+            });
 
-        GraphRequest request = GraphRequest.newMeRequest(token, new GraphRequest.GraphJSONObjectCallback() {
-            @Override
-            public void onCompleted(JSONObject fbUser, GraphResponse graphResponse) {
-                firebaseAccessCheck(token, fbUser);
-            }
-        });
-
-        Bundle bundle=new Bundle();
-        bundle.putString("fields","id,email,name");
-        request.setParameters(bundle);
-        request.executeAsync();
-
+            Bundle bundle = new Bundle();
+            bundle.putString("fields", "id,email,name");
+            request.setParameters(bundle);
+            request.executeAsync();
+        } catch (Exception ex) {
+            handleNonFatalError(getString(R.string.Receiving_facebook_profile_failed), true);
+        }
     }
 
     private void firebaseAccessCheck(AccessToken token, final JSONObject fbUser){
@@ -416,50 +421,59 @@ public class LoginDialogFragment extends DialogFragment implements FacebookCallb
         hideSoftKeyboard();
         if (isRequiredFields(loginRegistrationEmailWrapper, loginRegistrationPasswordWrapper)) {
 //            SettingsMy.setUserEmailHint(etRegistrationEmail.getText().toString());
-            registerNewUser(loginRegistrationEmailWrapper.getEditText(), loginRegistrationPasswordWrapper.getEditText());
+            try{
+                registerNewUser(loginRegistrationEmailWrapper.getEditText(), loginRegistrationPasswordWrapper.getEditText());
+            }catch(Exception ex){
+                MsgUtils.showToast(getActivity(), MsgUtils.TOAST_TYPE_INTERNAL_ERROR, null, MsgUtils.ToastLength.SHORT);
+            }
         }
     }
 
     private void registerNewUser(EditText editTextEmail, EditText editTextPassword) {
         SettingsMy.setUserEmailHint(editTextEmail.getText().toString());
         progressDialog.show();
+        try {
+            mAuth.createUserWithEmailAndPassword(editTextEmail.getText().toString().trim(), editTextPassword.getText().toString().trim())
+                    .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                        @Override
+                        public void onComplete(@NonNull Task<AuthResult> task) {
 
-        mAuth.createUserWithEmailAndPassword(editTextEmail.getText().toString().trim(), editTextPassword.getText().toString().trim())
-                .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        Log.d(TAG, "createUserWithEmail:onComplete:" + task.isSuccessful());
-
-                        // If sign in fails, display a message to the user. If sign in succeeds
-                        // the auth state listener will be notified and logic to handle the
-                        // signed in user can be handled in the listener.
-                        if (!task.isSuccessful()) {
-                            Timber.d(MSG_RESPONSE, "Parse new user registration failed");
-                            MsgUtils.showToast(getActivity(), MsgUtils.TOAST_TYPE_INTERNAL_ERROR, null, MsgUtils.ToastLength.SHORT);
-                            if (progressDialog != null) progressDialog.cancel();
-                            return;
-                        }
-                        final User user = new User(task.getResult().getUser().getUid());
-                        user.setGender(loginRegistrationGenderWoman.isChecked() ? "female" : "male");
-                        user.setProvider(getString(R.string.providers_email));
-                        UserController userController= new UserController(user);
-                        userController.getAuthInfo();
-                        userController.save(new UserController.FirebaseCallResult()
-                        {
-                            @Override
-                            public void onComplete(boolean result) {
-                                Timber.d(MSG_RESPONSE, user.toString());
-                                handleUserLogin(user);
+                            // If sign in fails, display a message to the user. If sign in succeeds
+                            // the auth state listener will be notified and logic to handle the
+                            // signed in user can be handled in the listener.
+                            if (!task.isSuccessful()) {
+                                Timber.d(MSG_RESPONSE, "Parse new user registration failed");
+                                MsgUtils.showToast(getActivity(), MsgUtils.TOAST_TYPE_INTERNAL_ERROR, null, MsgUtils.ToastLength.SHORT);
+                                if (progressDialog != null) progressDialog.cancel();
+                                return;
                             }
-                        });
-                    }
-                });
+                            final User user = new User(task.getResult().getUser().getUid());
+                            user.setGender(loginRegistrationGenderWoman.isChecked() ? "female" : "male");
+                            user.setProvider(getString(R.string.providers_email));
+                            UserController userController = new UserController(user);
+                            userController.getAuthInfo();
+                            userController.save(new UserController.FirebaseCallResult() {
+                                @Override
+                                public void onComplete(boolean result) {
+                                    Timber.d(MSG_RESPONSE, user.toString());
+                                    handleUserLogin(user);
+                                }
+                            });
+                        }
+                    });
+        } catch (Exception ex) {
+            MsgUtils.showToast("", MsgUtils.TOAST_TYPE_INTERNAL_ERROR, MsgUtils.ToastLength.LONG);
+        }
     }
 
     private void invokeLoginWithEmail() {
         hideSoftKeyboard();
         if (isRequiredFields(loginEmailEmailWrapper, loginEmailPasswordWrapper)) {
-            logInWithEmail(loginEmailEmailWrapper.getEditText(), loginEmailPasswordWrapper.getEditText());
+            try{
+                logInWithEmail(loginEmailEmailWrapper.getEditText(), loginEmailPasswordWrapper.getEditText());
+            }catch(Exception ex){
+                MsgUtils.showToast("", MsgUtils.TOAST_TYPE_INTERNAL_ERROR, MsgUtils.ToastLength.LONG);
+            }
         }
     }
 
@@ -474,7 +488,6 @@ public class LoginDialogFragment extends DialogFragment implements FacebookCallb
                 .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
-                        Log.d(TAG, "signInWithEmail:onComplete:" + task.isSuccessful());
                         editTextPassword.setText("");
                         // If sign in fails, display a message to the user. If sign in succeeds
                         // the auth state listener will be notified and logic to handle the
@@ -543,7 +556,11 @@ public class LoginDialogFragment extends DialogFragment implements FacebookCallb
             loginEmailForgottenEmailWrapper.setError(getString(R.string.Required_field));
         } else {
             loginEmailForgottenEmailWrapper.setErrorEnabled(false);
-            resetPassword(emailForgottenPasswordEmail);
+            try{
+                resetPassword(emailForgottenPasswordEmail);
+            }catch(Exception ex){
+                MsgUtils.showToast("", MsgUtils.TOAST_TYPE_INTERNAL_ERROR, MsgUtils.ToastLength.LONG);
+            }
         }
     }
 

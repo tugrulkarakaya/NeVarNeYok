@@ -9,6 +9,9 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.HashMap;
 import java.util.Map;
 
+import uk.co.nevarneyok.R;
+import uk.co.nevarneyok.utils.MsgUtils;
+
 
 public class AppSettingController {
     private FirebaseDatabase myFirebaseDatabase=FirebaseDatabase.getInstance();
@@ -18,29 +21,34 @@ public class AppSettingController {
 
 
     public void loadSettings(final AsyncResponse delegate) {
-        if (isFetched){
+        if (isFetched) {
             delegate.processFinish(isFetched);
             return;
         }
         refAppSettings = myFirebaseDatabase.getReference().child("Application").child("parameters");
-        refAppSettings.addListenerForSingleValueEvent(new ValueEventListener() {
+        try {
+            refAppSettings.addListenerForSingleValueEvent(new ValueEventListener() {
 
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                for (DataSnapshot ConSnapshot : dataSnapshot.getChildren()) {
-                    String value = ConSnapshot.getValue().toString();
-                    String key = ConSnapshot.getKey();
-                    parameters.put(key, value);
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    for (DataSnapshot ConSnapshot : dataSnapshot.getChildren()) {
+                        String value = ConSnapshot.getValue().toString();
+                        String key = ConSnapshot.getKey();
+                        parameters.put(key, value);
+                    }
+                    isFetched = true;
+                    delegate.processFinish(isFetched);
                 }
-                isFetched = true;
-                delegate.processFinish(isFetched);
-            }
 
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                delegate.processFinish(isFetched);
-            }
-        });
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                    delegate.processFinish(isFetched);
+                }
+
+            });
+        } catch (Exception ex) {
+            MsgUtils.showToast(R.string.data_retrieve_error, MsgUtils.TOAST_TYPE_MESSAGE, MsgUtils.ToastLength.LONG);
+        }
     }
 
     public void refreshSettings(AsyncResponse delegate){

@@ -26,6 +26,7 @@ import javax.net.ssl.HttpsURLConnection;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 
+//TODO Muhammet ÇAĞRI exception handling bu sınıfa uygulanmadı. Uygulanmalı.
 
 public class OpenTokRestApiController extends AsyncTask<String, Void, String> {
 

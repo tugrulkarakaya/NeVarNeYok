@@ -34,11 +34,17 @@ public class UserController  {
     public void setUser(User user){this.user = user;}
 
     private DatabaseReference getFirReference() {
-        if(user.getUid() == null || user.getUid().trim().length() == 0){
-            String newKey = FIRDataServices.DBUserRef.push().getKey();
-            user.setUid(newKey);
+        try {
+            if (user.getUid() == null || user.getUid().trim().length() == 0) {
+                String newKey = FIRDataServices.DBUserRef.push().getKey();
+                user.setUid(newKey);
+            }
+            return FIRDataServices.DBUserRef.child(user.getUid());
         }
-        return FIRDataServices.DBUserRef.child(user.getUid());
+        catch(Exception ex){
+            MsgUtils.showToast("", MsgUtils.TOAST_TYPE_INTERNAL_ERROR, MsgUtils.ToastLength.LONG);
+        }
+        return null;
     }
 
     public UserController(User user){
@@ -64,29 +70,35 @@ public class UserController  {
                     }
             );
         } catch(Exception e){
-                //MsgUtils.showToast(getParent(),MsgUtils.TOAST_TYPE_INTERNAL_ERROR, getString(R.string.Sign_out_error),MsgUtils.ToastLength.SHORT);
+            MsgUtils.showToast(R.string.save_error, MsgUtils.TOAST_TYPE_MESSAGE, MsgUtils.ToastLength.LONG);
         }
     }
 
     public void getAuthInfo(){
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-        if (user != null) {
+        try {
+            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
-            String displayName = user.getDisplayName();
-            if(displayName!=null && displayName.trim().length()>0) {
-                this.user.setName(user.getDisplayName());
+            if (user != null) {
+
+                String displayName = user.getDisplayName();
+                if (displayName != null && displayName.trim().length() > 0) {
+                    this.user.setName(user.getDisplayName());
+                }
+
+                String email = user.getEmail();
+                if (email != null && email.trim().length() > 0) {
+                    this.user.setEmail(user.getEmail());
+                }
+                Uri photoUrl = user.getPhotoUrl();
+
+                // The user's ID, unique to the Firebase project. Do NOT use this value to
+                // authenticate with your backend server, if you have one. Use
+                // FirebaseUser.getToken() instead.
+                String uid = user.getUid();
             }
-
-            String email = user.getEmail();
-            if(email!=null && email.trim().length()>0){
-                this.user.setEmail(user.getEmail());
-            }
-            Uri photoUrl = user.getPhotoUrl();
-
-            // The user's ID, unique to the Firebase project. Do NOT use this value to
-            // authenticate with your backend server, if you have one. Use
-            // FirebaseUser.getToken() instead.
-            String uid = user.getUid();
+        }
+        catch(Exception ex){
+            MsgUtils.showToast("", MsgUtils.TOAST_TYPE_INTERNAL_ERROR, MsgUtils.ToastLength.LONG);
         }
     }
 
@@ -133,7 +145,7 @@ public class UserController  {
             });
         }
         catch(Exception e){
-            MsgUtils.showToast(R.string.Sign_out_error, MsgUtils.TOAST_TYPE_MESSAGE, MsgUtils.ToastLength.LONG);
+            MsgUtils.showToast(R.string.data_retrieve_error, MsgUtils.TOAST_TYPE_MESSAGE, MsgUtils.ToastLength.LONG);
         }
     }
 

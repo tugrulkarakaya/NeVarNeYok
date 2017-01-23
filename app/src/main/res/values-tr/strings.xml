@@ -166,4 +166,5 @@
     <string name="select_language">Dil Seçin</string>
     <string name="Sign_out_error">Oturum sonlandırılırken hata oluştu</string>
     <string name="data_retrieve_error">Veri çekilirken hata oldu</string>
+    <string name="save_error">Kaydederken sorun oluştu</string>
 </resources>
