@@ -13,7 +13,6 @@ import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.DialogFragment;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -29,8 +28,6 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.TextView;
-import android.widget.Toast;
-
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -39,21 +36,16 @@ import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.GraphRequest;
-import com.facebook.GraphRequestAsyncTask;
 import com.facebook.GraphResponse;
-import com.facebook.appevents.AppEventsLogger;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
-
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.util.Arrays;
-
 import uk.co.nevarneyok.BuildConfig;
 import uk.co.nevarneyok.CONST;
 import uk.co.nevarneyok.MyApplication;
@@ -61,7 +53,6 @@ import uk.co.nevarneyok.R;
 import uk.co.nevarneyok.SettingsMy;
 import uk.co.nevarneyok.api.EndPoints;
 import uk.co.nevarneyok.api.GsonRequest;
-import uk.co.nevarneyok.api.JsonRequest;
 import uk.co.nevarneyok.controllers.UserController;
 import uk.co.nevarneyok.entities.User;
 import uk.co.nevarneyok.interfaces.LoginDialogInterface;
@@ -73,13 +64,8 @@ import uk.co.nevarneyok.utils.Utils;
 import uk.co.nevarneyok.ux.MainActivity;
 import timber.log.Timber;
 import com.facebook.FacebookSdk;
-
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.FacebookAuthProvider;
-import com.google.gson.JsonNull;
-
-import static android.content.ContentValues.TAG;
-import static com.android.volley.VolleyLog.TAG;
 import static com.facebook.FacebookSdk.getApplicationContext;
 
 /**
@@ -462,6 +448,7 @@ public class LoginDialogFragment extends DialogFragment implements FacebookCallb
                         }
                     });
         } catch (Exception ex) {
+            if (progressDialog != null) progressDialog.cancel();
             MsgUtils.showToast("", MsgUtils.TOAST_TYPE_INTERNAL_ERROR, MsgUtils.ToastLength.LONG);
         }
     }

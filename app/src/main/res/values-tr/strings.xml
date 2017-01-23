@@ -167,4 +167,14 @@
     <string name="Sign_out_error">Oturum sonlandırılırken hata oluştu</string>
     <string name="data_retrieve_error">Veri çekilirken hata oldu</string>
     <string name="save_error">Kaydederken sorun oluştu</string>
+    <string name="Contact_List">Kişiler</string>
+    <string name="endCall1">Çağrıyı sonlandır</string>
+    <string name="menu_settings">Ayarlar</string>
+    <string name="notification">Giden Arama</string>
+    <string name="audioOnly">Sadece ses</string>
+    <string name="archivingOff">Arşiv kapalı</string>
+    <string name="archivingOn">Arşiv açık</string>
+    <string name="friends_group">Arama Grubu</string>
+    <string name="hello_blank_fragment"></string>
+    <string name="Saving">Bilgileriniz Kaydediliyor...</string>
 </resources>

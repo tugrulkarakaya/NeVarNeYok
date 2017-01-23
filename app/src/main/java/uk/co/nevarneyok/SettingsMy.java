@@ -114,7 +114,6 @@ public class SettingsMy {
                 Timber.d("%s - Returned null", TAG);
                 return null;
             } else {
-                //TODO TUGRUL Active User neden GsonPArserdan geliyor bu nasıl bir kod??
                 activeUser = Utils.getGsonParser().fromJson(json, User.class);
                 Timber.d("%s - Returned active user from memory: %s", TAG, activeUser.toString());
                 return activeUser;

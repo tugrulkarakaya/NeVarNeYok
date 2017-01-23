@@ -195,32 +195,6 @@ public class AccountFragment extends Fragment {
                 }
             }
         });
-
-        //TODO TUGRUL aşağıdaki kodu sadece en sonraki fragmentin gittiği yerde login sayfasına yönlendirdiği için tutuyorum inceleyeceğim.
-/*
-        String url = String.format(EndPoints.USER_SINGLE, SettingsMy.getActualNonNullShop(getActivity()).getId(), user.getId());
-        pDialog.show();
-
-        GsonRequest<User> getUser = new GsonRequest<>(Request.Method.GET, url, null, User.class,
-                new Response.Listener<User>() {
-                    @Override
-                    public void onResponse(@NonNull User response) {
-                        Timber.d("response: %s", response.toString());
-                        SettingsMy.setActiveUser(response);
-                        refreshScreen(SettingsMy.getActiveUser());
-                        if (pDialog != null) pDialog.cancel();
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                if (pDialog != null) pDialog.cancel();
-                MsgUtils.logAndShowErrorMessage(getActivity(), error);
-            }
-        }, getFragmentManager(), user.getAccessToken());
-        getUser.setRetryPolicy(MyApplication.getDefaultRetryPolice());
-        getUser.setShouldCache(false);
-        MyApplication.getInstance().addToRequestQueue(getUser, CONST.ACCOUNT_REQUESTS_TAG);
-*/
     }
 
     private void refreshScreen(User user) {
@@ -240,7 +214,11 @@ public class AccountFragment extends Fragment {
                 SimpleDateFormat dateformat = new SimpleDateFormat("dd/MM/yyyy");
                 Date birtdate = new Date();
                 birtdate.setTime(user.getBirthDate());
-                tvBirthDate.setText(dateformat.format(birtdate));
+                try{
+                    tvBirthDate.setText(dateformat.format(birtdate));
+                }catch(Exception ex){
+
+                }
             }
             tvEmail.setText(user.getEmail());
             tvPhone.setText(user.getPhone());
@@ -249,7 +227,11 @@ public class AccountFragment extends Fragment {
                 imageUrl =user.getProfileImageUrl().toString();
 
                 if (imageUrl!=null){
-                    Picasso.with(this.getContext()).load(imageUrl).into(profilePicture);
+                    try {
+                        Picasso.with(this.getContext()).load(imageUrl).into(profilePicture);
+                    } catch(Exception ex){
+
+                    }
                 }
 
             }

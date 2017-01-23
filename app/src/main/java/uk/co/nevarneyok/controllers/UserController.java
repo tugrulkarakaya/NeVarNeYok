@@ -71,6 +71,8 @@ public class UserController  {
             );
         } catch(Exception e){
             MsgUtils.showToast(R.string.save_error, MsgUtils.TOAST_TYPE_MESSAGE, MsgUtils.ToastLength.LONG);
+            callResult.onComplete(false);
+
         }
     }
 
@@ -146,6 +148,7 @@ public class UserController  {
         }
         catch(Exception e){
             MsgUtils.showToast(R.string.data_retrieve_error, MsgUtils.TOAST_TYPE_MESSAGE, MsgUtils.ToastLength.LONG);
+            callResult.setResult(false, user);
         }
     }
 

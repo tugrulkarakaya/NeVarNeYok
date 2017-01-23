@@ -207,7 +207,6 @@
     <string name="select_language">Select Language</string>
 
     <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="Contact_List">Contact List</string>
     <string name="friends_group">Friends Group</string>
     <string name="Sign_out_error">An error occured during sign out process</string>
@@ -219,4 +218,5 @@
     <string name="notification">Ongoing call</string>
     <string name="audioOnly">Audio only</string>
     <string name="save_error">an error occurred while saving</string>
+    <string name="Saving">Saving...</string>
 </resources>

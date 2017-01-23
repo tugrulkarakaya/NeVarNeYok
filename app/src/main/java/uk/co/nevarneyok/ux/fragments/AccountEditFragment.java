@@ -26,6 +26,7 @@ import android.widget.LinearLayout;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -164,19 +165,24 @@ public class AccountEditFragment extends Fragment {
                 if (!isPasswordForm) {
                     try {
                         final User user = getUserFromView();
-                        mProgress.setMessage("Bilgileriniz Kaydediliyor...");
+                        mProgress.setMessage(getString(R.string.Saving));
                         mProgress.setCancelable(false);
                         mProgress.show();
                         if(mImageUri!=null){
-                            StorageReference filepath = FIRDataServices.StorageUser.child(mImageUri.getLastPathSegment());
-                            filepath.putFile(mImageUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                                @Override
-                                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                                    Uri downloadUrl = taskSnapshot.getDownloadUrl();
-                                    user.setProfileImageUrl(downloadUrl.toString());
-                                    putUser(user);
-                                }
-                            });
+
+                                StorageReference filepath = FIRDataServices.StorageUser.child(mImageUri.getLastPathSegment());
+                                filepath.putFile(mImageUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                                    @Override
+                                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                                        try {
+                                            Uri downloadUrl = taskSnapshot.getDownloadUrl();
+                                            user.setProfileImageUrl(downloadUrl.toString());
+                                            putUser(user);
+                                        } catch (Exception ex) {
+                                            MsgUtils.showToast("", MsgUtils.TOAST_TYPE_INTERNAL_ERROR, MsgUtils.ToastLength.LONG);
+                                        }
+                                    }
+                                });
                         }
                         else{
                             putUser(user);
@@ -289,23 +295,24 @@ public class AccountEditFragment extends Fragment {
         Utils.setTextToInputLayout(nameInputWrapper, user.getName());
         Utils.setTextToInputLayout(emailInputWrapper, user.getEmail());
         Utils.setTextToInputLayout(phoneInputWrapper, user.getPhone());
-        //TODO Çağrı Cagri CAGRI aşağıda string long tarih seçeneği vs hikayeleri var. sen edit ekranında takvim ile sçeilmesini sağla.
-        //
-        SimpleDateFormat dateformat = new SimpleDateFormat("dd/MM/yyyy");
-        Date birtdate = new Date();
-        birtdate.setTime(user.getBirthDate());
-        //
-        Utils.setTextToInputLayout(birthDateInputWrapper, dateformat.format(birtdate));
-        String imageUrl=null;
-        if (user.getProfileImageUrl()!=null) {
-            imageUrl =user.getProfileImageUrl().toString();
+        try {
+            SimpleDateFormat dateformat = new SimpleDateFormat("dd/MM/yyyy");
+            Date birtdate = new Date();
+            birtdate.setTime(user.getBirthDate());
+            //
+            Utils.setTextToInputLayout(birthDateInputWrapper, dateformat.format(birtdate));
+            String imageUrl = null;
+            if (user.getProfileImageUrl() != null) {
+                imageUrl = user.getProfileImageUrl().toString();
 
-            if (imageUrl!=null){
-                Picasso.with(this.getContext()).load(imageUrl).into(profilePicture);
+                if (imageUrl != null) {
+                    Picasso.with(this.getContext()).load(imageUrl).into(profilePicture);
+                }
+
             }
-
+        } catch (Exception ex) {
+            MsgUtils.showToast("",MsgUtils.TOAST_TYPE_INTERNAL_ERROR, MsgUtils.ToastLength.LONG);
         }
-
     }
 
     /**
@@ -363,27 +370,35 @@ public class AccountEditFragment extends Fragment {
             if (activeUser != null) {
                 progressDialog.show();
                 UserController userController = new UserController(user);
-                userController.save(new UserController.FirebaseCallResult(){
-                    @Override
-                    public void onComplete(boolean result) {
-                        if(result){
-                            SettingsMy.setActiveUser(user);
-                            refreshScreen(user);
-                            progressDialog.cancel();
-                            MsgUtils.showToast(getActivity(), MsgUtils.TOAST_TYPE_MESSAGE, getString(R.string.Ok), MsgUtils.ToastLength.SHORT);
-                            getFragmentManager().popBackStackImmediate();
-                        } else{
-                            if (progressDialog != null) progressDialog.cancel();
-                            JSONObject json = new JSONObject();
+                try {
+                    userController.save(new UserController.FirebaseCallResult() {
+                        @Override
+                        public void onComplete(boolean result) {
                             try {
-                                json = new JSONObject(getString(R.string.Your_session_has_expired_Please_log_in_again));
-                            } catch (JSONException e) {
-                                e.printStackTrace();
+                                if (result) {
+                                    SettingsMy.setActiveUser(user);
+                                    refreshScreen(user);
+                                    progressDialog.cancel();
+                                    MsgUtils.showToast(getActivity(), MsgUtils.TOAST_TYPE_MESSAGE, getString(R.string.Ok), MsgUtils.ToastLength.SHORT);
+                                    getFragmentManager().popBackStackImmediate();
+                                } else {
+                                    if (progressDialog != null) progressDialog.cancel();
+                                    JSONObject json = new JSONObject();
+                                    try {
+                                        json = new JSONObject(getString(R.string.Your_session_has_expired_Please_log_in_again));
+                                    } catch (JSONException e) {
+                                        e.printStackTrace();
+                                    }
+                                    MsgUtils.showMessage(getActivity(), json);
+                                }
+                            } catch (Exception ex) {
+                                MsgUtils.showToast("",MsgUtils.TOAST_TYPE_INTERNAL_ERROR, MsgUtils.ToastLength.LONG);
                             }
-                            MsgUtils.showMessage(getActivity(), json);
                         }
-                    }
-                });
+                    });
+                } catch (Exception ex) {
+                    MsgUtils.showToast("", MsgUtils.TOAST_TYPE_INTERNAL_ERROR, MsgUtils.ToastLength.LONG);
+                }
             } else {
                 LoginExpiredDialogFragment loginExpiredDialogFragment = new LoginExpiredDialogFragment();
                 loginExpiredDialogFragment.show(getFragmentManager(), "loginExpiredDialogFragment");
@@ -402,11 +417,17 @@ public class AccountEditFragment extends Fragment {
 
             User user = SettingsMy.getActiveUser();
             if (user != null) {
-                final FirebaseUser firUser = FirebaseAuth.getInstance().getCurrentUser();
+                FirebaseUser firUser = null;
+                AuthCredential credential= null;
+                try {
+                    firUser = FirebaseAuth.getInstance().getCurrentUser();
 
-                AuthCredential credential = EmailAuthProvider
-                        .getCredential(firUser.getEmail(), Utils.getTextFromInputLayout(currentPasswordWrapper).trim());
-
+                    credential = EmailAuthProvider
+                            .getCredential(firUser.getEmail(), Utils.getTextFromInputLayout(currentPasswordWrapper).trim());
+                } catch(Exception ex){
+                    if (progressDialog != null) progressDialog.cancel();
+                    MsgUtils.showToast("",MsgUtils.TOAST_TYPE_INTERNAL_ERROR, MsgUtils.ToastLength.LONG);
+                }
                 // Prompt the user to re-provide their sign-in credentials
                 firUser.reauthenticate(credential)
                         .addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -415,18 +436,18 @@ public class AccountEditFragment extends Fragment {
                                 if (task.isSuccessful()) {
                                     Log.d(TAG, "User re-authenticated.");
                                     String newPassword = Utils.getTextFromInputLayout(newPasswordWrapper).trim();
-
-                                    firUser.updatePassword(newPassword)
+                                    final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                                    user.updatePassword(newPassword)
                                             .addOnCompleteListener(new OnCompleteListener<Void>() {
                                                 @Override
                                                 public void onComplete(@NonNull Task<Void> task) {
                                                     if (task.isSuccessful()) {
-                                                        Timber.d("Change password successful: %s", firUser);
+                                                        Timber.d("Change password successful: %s", user);
                                                         MsgUtils.showToast(getActivity(), MsgUtils.TOAST_TYPE_MESSAGE, getString(R.string.Ok), MsgUtils.ToastLength.SHORT);
                                                         if (progressDialog != null) progressDialog.cancel();
                                                         getFragmentManager().popBackStackImmediate();
                                                     } else {
-                                                        Timber.d("Change password unsuccessful: %s", firUser);
+                                                        Timber.d("Change password unsuccessful: %s", user);
                                                         MsgUtils.showToast(getActivity(), MsgUtils.TOAST_TYPE_INTERNAL_ERROR, getString(R.string.Password_change_error), MsgUtils.ToastLength.LONG);
                                                         if (progressDialog != null) progressDialog.cancel();
                                                     }
