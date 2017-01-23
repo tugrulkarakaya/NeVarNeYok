@@ -321,28 +321,31 @@ public class MainActivity extends AppCompatActivity implements DrawerFragment.Fr
         getMenuInflater().inflate(R.menu.menu_main, menu);
 
         // Prepare search view
-        MenuItem searchItem = menu.findItem(R.id.action_search);
+        MenuItem searchItem = menu.findItem(R.id.menu_action_search);
+        searchItem.setVisible(false);
         if (searchItem != null) {
             prepareSearchView(searchItem);
         }
 
         // Prepare cart count info
-        MenuItem cartItem = menu.findItem(R.id.action_cart);
-        MenuItemCompat.setActionView(cartItem, R.layout.action_icon_shopping_cart);
-        View view = MenuItemCompat.getActionView(cartItem);
-        cartCountView = (TextView) view.findViewById(R.id.shopping_cart_notify);
-        showNotifyCount(cartCountNotificationValue);
-        view.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-//                onCartSelected();
-                replaceFragment(new ContactsFragment(),ContactsFragment.class.getSimpleName());
-            }
-        });
-        if (cartCountNotificationValue == CONST.DEFAULT_EMPTY_ID) {
-            // If first cart count check, then sync server cart data.
-            getCartCount(true);
-        }
+        MenuItem cartItem = menu.findItem(R.id.menu_action_contacts);
+//        MenuItemCompat.setActionView(cartItem, R.layout.action_icon_shopping_cart);
+//        View view = MenuItemCompat.getActionView(cartItem);
+//        cartCountView = (TextView) view.findViewById(R.id.shopping_cart_notify);
+//        showNotifyCount(cartCountNotificationValue);
+//        view.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+////                onCartSelected();
+//                replaceFragment(new ContactsFragment(),ContactsFragment.class.getSimpleName());
+//            }
+//        });
+//        if (cartCountNotificationValue == CONST.DEFAULT_EMPTY_ID) {
+//            // If first cart count check, then sync server cart data.
+//            getCartCount(true);
+//        }
+        MenuItem refreshItem = menu.findItem(R.id.menu_action_search);
+
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -539,14 +542,17 @@ public class MainActivity extends AppCompatActivity implements DrawerFragment.Fr
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_wish_list) {
+        if (id == R.id.menu_action_call) {
             //onWishlistSelected();
             replaceFragment(new FriendsGroupFragment(),FriendsGroupFragment.class.getSimpleName());
             return true;
-        } else if (id == R.id.action_cart) {
+        } else if (id == R.id.menu_action_contacts) {
 //            onCartSelected();
             replaceFragment(new ContactsFragment(),ContactsFragment.class.getSimpleName());
             return true;
+        }
+        else if(id==R.id.menu_action_refresh){
+
         }
 
         return super.onOptionsItemSelected(item);

@@ -1,12 +1,8 @@
 package uk.co.nevarneyok.ux.fragments;
 
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.ContentResolver;
-import android.content.Context;
-import android.content.Intent;
 import android.database.Cursor;
-import android.icu.text.AlphabeticIndex;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -22,28 +18,20 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
-import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
 import java.text.Collator;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
 
 import uk.co.nevarneyok.R;
 import uk.co.nevarneyok.SettingsMy;
 import uk.co.nevarneyok.controllers.CallingContacts;
-import uk.co.nevarneyok.controllers.UserController;
 import uk.co.nevarneyok.entities.Contact;
 import uk.co.nevarneyok.entities.User;
 import uk.co.nevarneyok.ux.MainActivity;
@@ -52,7 +40,6 @@ import uk.co.nevarneyok.ux.MainActivity;
  * A simple {@link Fragment} subclass.
  */
 public class ContactsFragment extends Fragment {
-    static CallingContacts callingContacts=null;
 
     Cursor cursor;
     ArrayList<Contact> contactlist = new ArrayList<Contact>();
@@ -64,6 +51,7 @@ public class ContactsFragment extends Fragment {
     DatabaseReference pushRef;
 
     DatabaseReference myFirebaseRef;
+    Query myQueryRef;
     private RecyclerView contactsListView;
     User activeUser = SettingsMy.getActiveUser();
 
@@ -85,12 +73,10 @@ public class ContactsFragment extends Fragment {
         pDialog = new ProgressDialog(getContext());
 
         if(activeUser!=null){
-            callingContacts = new CallingContacts();
             myRef = FirebaseDatabase.getInstance().getReference("contacts").child(activeUser.getUid());
         }
         myFirebaseRef=myRef.child("contacts");
-
-
+        myQueryRef = myFirebaseRef.orderByChild("name");
 
         // Inflate the layout for this fragment
         return view;
@@ -98,6 +84,7 @@ public class ContactsFragment extends Fragment {
 
     public static class ContactListHolder extends RecyclerView.ViewHolder{
         View mView;
+        CallingContacts callingContacts=new CallingContacts();
         public ContactListHolder(View itemView) {
             super(itemView);
             mView = itemView;
@@ -110,14 +97,6 @@ public class ContactsFragment extends Fragment {
         public void setPhone(String phone){
             TextView contact_phone = (TextView) mView.findViewById(R.id.contact_phone);
             contact_phone.setText(phone);
-        }
-        public void setPhoto(String photo){
-            ImageView contact_photo = (ImageView) mView.findViewById(R.id.contact_photo);
-            if(photo!=null) {
-                Picasso.with(mView.getContext()).load(photo).into(contact_photo);
-            }else{
-                contact_photo.setBackgroundResource(R.drawable.user_black);
-            }
         }
         public void setAdd(final String key, final Contact contact){
             ImageView contact_add_remove = (ImageView) mView.findViewById(R.id.contact_add_remove);
@@ -143,7 +122,7 @@ public class ContactsFragment extends Fragment {
                 Contact.class,
                 R.layout.contacts_list_row,
                 ContactListHolder.class,
-                myFirebaseRef
+                myQueryRef
 
         ) {
             @Override
@@ -151,14 +130,13 @@ public class ContactsFragment extends Fragment {
 
                 viewHolder.setName(model.getName());
                 viewHolder.setPhone(model.getPhone());
-                viewHolder.setPhoto(model.getPhotoUrl());
                 viewHolder.setAdd(getRef(position).getKey(),model);
             }
         };
         contactsListView.setAdapter(firebaseRecyclerAdapter);
 
-        UserController userController;
         if(activeUser != null){
+            final CallingContacts callingContacts=new CallingContacts();
             callingContacts.existsData(new CallingContacts.completion() {
                 @Override
                 public void setResult(boolean result) {
@@ -169,8 +147,19 @@ public class ContactsFragment extends Fragment {
                         new Thread(new Runnable() {
                             @Override
                             public void run() {
-                                getContacts();
-
+                                getContacts(false);
+                            }
+                        }).start();
+                    }
+                    else{
+//                        pDialog.setMessage("Reading contacts...");
+//                        pDialog.setCancelable(false);
+//                        pDialog.show();
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                getContacts(true);
+                                callingContacts.refreshContacts(contactlist);
                             }
                         }).start();
                     }
@@ -182,7 +171,7 @@ public class ContactsFragment extends Fragment {
 
     }
 
-    public void getContacts() {
+    public void getContacts(final boolean refresh) {
 
         String phoneNumber = null;
         Uri CONTENT_URI = ContactsContract.Contacts.CONTENT_URI;
@@ -255,11 +244,12 @@ public class ContactsFragment extends Fragment {
                             }
                         }
                     }
-                    for(Contact contact : contactlist){
-                        pushRef = myRef.child("contacts").push();
-                        pushRef.setValue(contact);
+                    if (!refresh) {
+                        for(Contact contact : contactlist){
+                            pushRef = myRef.child("contacts").push();
+                            pushRef.setValue(contact);
+                        }
                     }
-
                 }
             });
             // Dismiss the progressbar after 500 millisecondds

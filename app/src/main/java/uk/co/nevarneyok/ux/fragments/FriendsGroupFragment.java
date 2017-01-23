@@ -15,6 +15,7 @@ import android.widget.Toast;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.squareup.picasso.Picasso;
 
 import uk.co.nevarneyok.R;
@@ -32,6 +33,7 @@ public class FriendsGroupFragment extends Fragment {
 
     DatabaseReference myRef=FirebaseDatabase.getInstance().getReference();
     DatabaseReference myFirebaseRef;
+    Query myQueryRef;
 
     static CallingContacts callingContacts;
 
@@ -57,6 +59,7 @@ public class FriendsGroupFragment extends Fragment {
             myRef = FirebaseDatabase.getInstance().getReference("contacts").child(activeUser.getUid());
         }
         myFirebaseRef=myRef.child("callinggroups").child("friends");
+        myQueryRef = myFirebaseRef.orderByChild("name");
 
         return view;
     }
@@ -103,9 +106,9 @@ public class FriendsGroupFragment extends Fragment {
         super.onStart();
         FirebaseRecyclerAdapter<Contact, FriendsGroupListHolder> firebaseRecyclerAdapter = new FirebaseRecyclerAdapter<Contact, FriendsGroupListHolder>(
                 Contact.class,
-                R.layout.contacts_list_row,
+                R.layout.friends_group_list_row,
                 FriendsGroupListHolder.class,
-                myFirebaseRef
+                myQueryRef
 
         ) {
             @Override

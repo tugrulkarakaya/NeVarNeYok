@@ -174,7 +174,10 @@
     <string name="audioOnly">Sadece ses</string>
     <string name="archivingOff">Arşiv kapalı</string>
     <string name="archivingOn">Arşiv açık</string>
-    <string name="friends_group">Arama Grubu</string>
     <string name="hello_blank_fragment"></string>
     <string name="Saving">Bilgileriniz Kaydediliyor...</string>
+    <string name="menu_action_call">Çağrı Grubu</string>
+    <string name="friends_group">Arkadaş Grubu</string>
+    <string name="menu_action_refresh">refresh</string>
+    <string name="menu_action_contacts">Kişiler</string>
 </resources>
