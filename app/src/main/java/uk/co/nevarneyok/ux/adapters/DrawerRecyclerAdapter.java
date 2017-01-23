@@ -102,10 +102,15 @@ public class DrawerRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vie
             if (user != null) {
                 viewHolderHeader.userName.setText(user.getEmail());
                 if(user.getProfileImageUrl()!=null){
-                    Picasso.with(this.context).load(user.getProfileImageUrl()).into(viewHolderHeader.accountPhoto);
+                    try {
+                        Picasso.with(this.context).load(user.getProfileImageUrl()).into(viewHolderHeader.accountPhoto);
+                    } catch(Exception ex){
+
+                    }
                 }
             } else {
                 viewHolderHeader.userName.setText(context.getString(R.string.Unknown_user));
+                Picasso.with(this.context).load(R.drawable.user).into(viewHolderHeader.accountPhoto);
             }
 
         }
