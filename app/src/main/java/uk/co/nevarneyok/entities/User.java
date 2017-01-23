@@ -34,6 +34,7 @@ public class User {
     private String Uid;
     private String providerId;
     private String provider;
+    private Boolean phoneValidated=false;
 
     public User() {
 
@@ -169,6 +170,10 @@ public class User {
 
     public void setProvider(String provider){this.provider = provider;}
 
+    public Boolean getPhoneValidated(){return this.phoneValidated;}
+
+    public void setPhoneValidated(Boolean phoneValidated) {this.phoneValidated = phoneValidated;}
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -196,6 +201,7 @@ public class User {
         if (Uid != null ? !Uid.equals(user.Uid) : user.Uid != null) return false;
         if (providerId != null ? !providerId.equals(user.providerId) : user.providerId != null) return false;
         if (provider != null ? !provider.equals(user.provider) : user.provider != null) return false;
+        if (phoneValidated != null ? !phoneValidated.equals(user.phoneValidated) : user.phoneValidated != null) return false;
         if (createDate != user.createDate) return false;
         return !(country != null ? !country.equals(user.country) : user.country != null);
 
@@ -222,6 +228,7 @@ public class User {
         result = 31 * result + (country != null ? country.hashCode() : 0);
         result = 31 * result + (provider != null ? provider.hashCode() : 0);
         result = 31 * result + (providerId != null ? providerId.hashCode() : 0);
+        result = 31 * result + (phoneValidated != null ? phoneValidated.hashCode() : 0);
         return result;
     }
 
@@ -246,6 +253,7 @@ public class User {
                 ", profileImageUrl='" + profileImageUrl + '\'' +
                 ", providerId='" + providerId + '\'' +
                 ", provider='" + provider + '\'' +
+                ", phoneValidatet='" + phoneValidated + '\'' +
                 '}';
     }
 
@@ -268,5 +276,6 @@ public class User {
         this.setUid(user.Uid);
         this.setProvider(user.provider);
         this.setProviderId(user.providerId);
+        this.setPhoneValidated(user.phoneValidated);
     }
 }
