@@ -13,6 +13,7 @@ import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.DialogFragment;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -28,9 +29,15 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.RadioButton;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.digits.sdk.android.AuthCallback;
+import com.digits.sdk.android.DigitsAuthButton;
+import com.digits.sdk.android.DigitsException;
+import com.digits.sdk.android.DigitsSession;
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
@@ -90,7 +97,7 @@ public class LoginDialogFragment extends DialogFragment implements FacebookCallb
     private TextInputLayout loginEmailPasswordWrapper;
     private TextInputLayout loginEmailForgottenEmailWrapper;
     private FirebaseAuth mAuth;
-
+    private DigitsAuthButton digitsButton;
 
     /**
      * Creates dialog which handles user login, registration and forgotten password function.
@@ -113,6 +120,7 @@ public class LoginDialogFragment extends DialogFragment implements FacebookCallb
         setStyle(DialogFragment.STYLE_NO_TITLE, R.style.dialogFullscreen);
         progressDialog = Utils.generateProgressDialog(getActivity(), false);
         mAuth = FirebaseAuth.getInstance();
+
     }
 
     @Override
@@ -168,6 +176,9 @@ public class LoginDialogFragment extends DialogFragment implements FacebookCallb
         loginRegistrationForm = (LinearLayout) view.findViewById(R.id.login_registration_form);
         loginEmailForm = (LinearLayout) view.findViewById(R.id.login_email_form);
         loginEmailForgottenForm = (LinearLayout) view.findViewById(R.id.login_email_forgotten_form);
+
+        digitsButton = (DigitsAuthButton) view.findViewById(R.id.auth_button);
+
 
         prepareLoginFormNavigation(view);
         prepareInputBoxes(view);
@@ -244,6 +255,21 @@ public class LoginDialogFragment extends DialogFragment implements FacebookCallb
                         setVisibilityOfEmailForm(false);
                     }
                 }, 200);
+            }
+        });
+
+        //SMS
+        digitsButton.setCallback(new AuthCallback() {
+            @Override
+            public void success(DigitsSession session, String phoneNumber) {
+                // TODO: associate the session userID with your user model
+                Toast.makeText(getApplicationContext(), "Authentication successful for "
+                        + phoneNumber, Toast.LENGTH_LONG).show();
+            }
+
+            @Override
+            public void failure(DigitsException exception) {
+                Log.d("Digits", "Sign in with Digits failure", exception);
             }
         });
 
@@ -518,7 +544,7 @@ public class LoginDialogFragment extends DialogFragment implements FacebookCallb
     private void handleUserLogin(User user) {
         if (progressDialog != null) progressDialog.cancel();
         SettingsMy.setActiveUser(user);
-
+        digitsButton.onClick(getView());
         // Invalidate GCM token for new registration with authorized user.
         SettingsMy.setTokenSentToServer(false);
 

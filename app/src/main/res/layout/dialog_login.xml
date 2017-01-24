@@ -71,6 +71,11 @@
             android:paddingStart="@dimen/base_margin_horizontal"
             android:text="@string/FACEBOOK"
             />
+        <com.digits.sdk.android.DigitsAuthButton
+            android:id="@+id/auth_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"/>
 
         <RelativeLayout
             android:layout_width="290dp"
