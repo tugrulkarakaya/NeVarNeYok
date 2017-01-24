@@ -29,6 +29,7 @@ public class CallingContacts {
     DatabaseReference myRef = FirebaseDatabase.getInstance().getReference("contacts").child(activeUser.getUid()).child("callinggroups");
     DatabaseReference getFirReference = FirebaseDatabase.getInstance().getReference("contacts").child(activeUser.getUid());
     DatabaseReference pushRef;
+    Query myQueryRef;
 
     HashMap<String,Contact> Contacts = new HashMap<String, Contact>();
     ArrayList<Contact> addContactList=new ArrayList<Contact>();
@@ -38,6 +39,9 @@ public class CallingContacts {
     }
     public interface getContactsCompletion{
         void setResult(HashMap<String,Contact> ContactHashMap);
+    }
+    public interface getUserCompletion{
+        void setResult(String key, User user);
     }
 
     public void addCallingGroup(String groupName, String contactsKey, Contact contact){
@@ -135,6 +139,44 @@ public class CallingContacts {
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    public void getUserExist(final getUserCompletion getUserCompletion){
+
+
+        myQueryRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot userSnapshot :
+                        dataSnapshot.getChildren()) {
+                    if (userSnapshot.exists()) {
+                        getUserCompletion.setResult(userSnapshot.getKey(),userSnapshot.getValue(User.class));
+                        break;
+                    }
+                    else getUserCompletion.setResult(null,null);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    public void checkFriendsGroup(String phone, final String contactkey){
+        myQueryRef = FirebaseDatabase.getInstance().getReference().child("users").orderByChild("phone").equalTo(phone);
+        getUserExist(new getUserCompletion() {
+            @Override
+            public void setResult(String key, User user) {
+                myRef.child("friends").child(contactkey).child("uid").setValue(key);
+                if (user.getProfileImageUrl() != null) {
+                    myRef.child("friends").child(contactkey).child("photoUrl").setValue(user.getProfileImageUrl());
+                }
+
 
             }
         });

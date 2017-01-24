@@ -5,14 +5,15 @@ package uk.co.nevarneyok.entities;
  */
 
 public class Contact {
-    private String name, phone, photoUrl;
+    private String name, phone, photoUrl, uid;
 
     public Contact(){}
 
-    public Contact(String name, String phone, String photoUrl) {
+    public Contact(String name, String phone, String photoUrl, String uid) {
         this.name = name;
         this.phone = phone;
         this.photoUrl = photoUrl;
+        this.uid = uid;
     }
 
     public String getName() {
@@ -37,5 +38,13 @@ public class Contact {
 
     public void setPhotoUrl(String photoUrl) {
         this.photoUrl = photoUrl;
+    }
+
+    public String getUid() {
+        return uid;
+    }
+
+    public void setUid(String uid) {
+        this.uid = uid;
     }
 }
