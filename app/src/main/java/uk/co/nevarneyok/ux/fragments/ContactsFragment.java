@@ -105,6 +105,7 @@ public class ContactsFragment extends Fragment {
                 @Override
                 public void onClick(View view) {
                     callingContacts.addCallingGroup("friends",key, contact);
+                    callingContacts.checkFriendsGroup(contact.getPhone(),key);
                     Toast.makeText(mView.getContext(), "Aranacaklar Listesine Eklendi.",
                             Toast.LENGTH_SHORT).show();
                 }

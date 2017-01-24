@@ -118,6 +118,11 @@ public class FriendsGroupFragment extends Fragment {
                 viewHolder.setPhone(model.getPhone());
                 viewHolder.setPhoto(model.getPhotoUrl());
                 viewHolder.setRemove(getRef(position).getKey());
+                if(model.getUid()==null || model.getPhotoUrl()==null){
+                    final CallingContacts callingContacts=new CallingContacts();
+                    callingContacts.checkFriendsGroup(model.getPhone(),getRef(position).getKey());
+                }
+
 
             }
         };
