@@ -130,6 +130,7 @@ dependencies {
     compile 'com.android.support:support-v4:25.1.0'
     compile 'com.opentok.android:opentok-android-sdk:2.10.+'
     compile 'io.jsonwebtoken:jjwt:0.7.0'
+    compile 'com.theartofdev.edmodo:android-image-cropper:2.3.+'
     testCompile 'junit:junit:4.12'
     testCompile 'org.mockito:mockito-all:1.10.19'
     testCompile 'org.hamcrest:hamcrest-library:1.3'
