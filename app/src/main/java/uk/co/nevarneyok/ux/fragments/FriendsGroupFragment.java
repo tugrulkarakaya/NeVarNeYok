@@ -16,6 +16,8 @@ import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
+import com.squareup.picasso.Callback;
+import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 
 import uk.co.nevarneyok.R;
@@ -60,6 +62,7 @@ public class FriendsGroupFragment extends Fragment {
         }
         myFirebaseRef=myRef.child("callinggroups").child("friends");
         myQueryRef = myFirebaseRef.orderByChild("name");
+        myQueryRef.keepSynced(true);
 
         return view;
     }
@@ -79,10 +82,20 @@ public class FriendsGroupFragment extends Fragment {
             TextView contact_phone = (TextView) mView.findViewById(R.id.contact_phone);
             contact_phone.setText(phone);
         }
-        public void setPhoto(String photo){
-            ImageView contact_photo = (ImageView) mView.findViewById(R.id.contact_photo);
+        public void setPhoto(final String photo){
+            final ImageView contact_photo = (ImageView) mView.findViewById(R.id.contact_photo);
             if(photo!=null) {
-                Picasso.with(mView.getContext()).load(photo).into(contact_photo);
+                Picasso.with(mView.getContext()).load(photo).networkPolicy(NetworkPolicy.OFFLINE).into(contact_photo, new Callback() {
+                    @Override
+                    public void onSuccess() {
+
+                    }
+
+                    @Override
+                    public void onError() {
+                        Picasso.with(mView.getContext()).load(photo).into(contact_photo);
+                    }
+                });
             }else{
                 contact_photo.setBackgroundResource(R.drawable.user_black);
             }
@@ -104,28 +117,31 @@ public class FriendsGroupFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
-        FirebaseRecyclerAdapter<Contact, FriendsGroupListHolder> firebaseRecyclerAdapter = new FirebaseRecyclerAdapter<Contact, FriendsGroupListHolder>(
-                Contact.class,
-                R.layout.friends_group_list_row,
-                FriendsGroupListHolder.class,
-                myQueryRef
+        if(activeUser!=null){
+            FirebaseRecyclerAdapter<Contact, FriendsGroupListHolder> firebaseRecyclerAdapter = new FirebaseRecyclerAdapter<Contact, FriendsGroupListHolder>(
+                    Contact.class,
+                    R.layout.friends_group_list_row,
+                    FriendsGroupListHolder.class,
+                    myQueryRef
 
-        ) {
-            @Override
-            protected void populateViewHolder(FriendsGroupListHolder viewHolder, final Contact model, int position) {
+            ) {
+                @Override
+                protected void populateViewHolder(FriendsGroupListHolder viewHolder, final Contact model, int position) {
 
-                viewHolder.setName(model.getName());
-                viewHolder.setPhone(model.getPhone());
-                viewHolder.setPhoto(model.getPhotoUrl());
-                viewHolder.setRemove(getRef(position).getKey());
-                if(model.getUid()==null || model.getPhotoUrl()==null){
-                    final CallingContacts callingContacts=new CallingContacts();
-                    callingContacts.checkFriendsGroup(model.getPhone(),getRef(position).getKey());
+                    viewHolder.setName(model.getName());
+                    viewHolder.setPhone(model.getPhone());
+                    viewHolder.setPhoto(model.getPhotoUrl());
+                    viewHolder.setRemove(getRef(position).getKey());
+                    if(model.getUid()==null || model.getPhotoUrl()==null){
+                        final CallingContacts callingContacts=new CallingContacts();
+                        callingContacts.checkFriendsGroup(model.getPhone(),getRef(position).getKey());
+                    }
+
+
                 }
+            };
+            contactsListView.setAdapter(firebaseRecyclerAdapter);
+        }
 
-
-            }
-        };
-        contactsListView.setAdapter(firebaseRecyclerAdapter);
     }
 }

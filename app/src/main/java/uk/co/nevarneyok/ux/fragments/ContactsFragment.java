@@ -77,6 +77,7 @@ public class ContactsFragment extends Fragment {
         }
         myFirebaseRef=myRef.child("contacts");
         myQueryRef = myFirebaseRef.orderByChild("name");
+        myQueryRef.keepSynced(true);
 
         // Inflate the layout for this fragment
         return view;
@@ -118,23 +119,24 @@ public class ContactsFragment extends Fragment {
     @Override
     public void onStart() {
         super.onStart();
+        if(activeUser!=null) {
+            FirebaseRecyclerAdapter<Contact, ContactListHolder> firebaseRecyclerAdapter = new FirebaseRecyclerAdapter<Contact, ContactListHolder>(
+                    Contact.class,
+                    R.layout.contacts_list_row,
+                    ContactListHolder.class,
+                    myQueryRef
 
-        FirebaseRecyclerAdapter<Contact, ContactListHolder> firebaseRecyclerAdapter = new FirebaseRecyclerAdapter<Contact, ContactListHolder>(
-                Contact.class,
-                R.layout.contacts_list_row,
-                ContactListHolder.class,
-                myQueryRef
+            ) {
+                @Override
+                protected void populateViewHolder(ContactListHolder viewHolder, final Contact model, int position) {
 
-        ) {
-            @Override
-            protected void populateViewHolder(ContactListHolder viewHolder, final Contact model, int position) {
-
-                viewHolder.setName(model.getName());
-                viewHolder.setPhone(model.getPhone());
-                viewHolder.setAdd(getRef(position).getKey(),model);
-            }
-        };
-        contactsListView.setAdapter(firebaseRecyclerAdapter);
+                    viewHolder.setName(model.getName());
+                    viewHolder.setPhone(model.getPhone());
+                    viewHolder.setAdd(getRef(position).getKey(), model);
+                }
+            };
+            contactsListView.setAdapter(firebaseRecyclerAdapter);
+        }
 
         if(activeUser != null){
             final CallingContacts callingContacts=new CallingContacts();

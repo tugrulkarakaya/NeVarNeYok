@@ -21,11 +21,15 @@ import com.android.volley.toolbox.Volley;
 import com.digits.sdk.android.Digits;
 import com.facebook.FacebookSdk;
 
+import com.google.firebase.database.FirebaseDatabase;
+import com.squareup.picasso.OkHttpDownloader;
+import com.squareup.picasso.Picasso;
 import com.twitter.sdk.android.core.TwitterAuthConfig;
 import com.twitter.sdk.android.core.TwitterCore;
 import io.fabric.sdk.android.Fabric;
 import java.util.Locale;
 
+import okhttp3.OkHttpClient;
 import uk.co.nevarneyok.api.OkHttpStack;
 import uk.co.nevarneyok.testing.EspressoIdlingResource;
 import timber.log.Timber;
@@ -100,6 +104,9 @@ public class MyApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        FirebaseDatabase.getInstance().setPersistenceEnabled(true);
+
+
         TwitterAuthConfig authConfig = new TwitterAuthConfig(TWITTER_KEY, TWITTER_SECRET);
         Fabric.with(this, new TwitterCore(authConfig), new Digits.Builder().build());
         mInstance = this;
