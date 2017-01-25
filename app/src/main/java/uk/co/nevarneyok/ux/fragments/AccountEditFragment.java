@@ -6,6 +6,8 @@ import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -38,10 +40,13 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
+import com.theartofdev.edmodo.cropper.CropImage;
+import com.theartofdev.edmodo.cropper.CropImageView;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.ByteArrayOutputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -169,20 +174,19 @@ public class AccountEditFragment extends Fragment {
                         mProgress.setCancelable(false);
                         mProgress.show();
                         if(mImageUri!=null){
-
-                                StorageReference filepath = FIRDataServices.StorageUser.child(mImageUri.getLastPathSegment());
-                                filepath.putFile(mImageUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                                    @Override
-                                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                                        try {
-                                            Uri downloadUrl = taskSnapshot.getDownloadUrl();
-                                            user.setProfileImageUrl(downloadUrl.toString());
-                                            putUser(user);
-                                        } catch (Exception ex) {
-                                            MsgUtils.showToast("", MsgUtils.TOAST_TYPE_INTERNAL_ERROR, MsgUtils.ToastLength.LONG);
-                                        }
+                            StorageReference filepath = FIRDataServices.StorageUser.child(mImageUri.getLastPathSegment());
+                            filepath.putFile(mImageUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                                @Override
+                                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                                    try {
+                                        Uri downloadUrl = taskSnapshot.getDownloadUrl();
+                                        user.setProfileImageUrl(downloadUrl.toString());
+                                        putUser(user);
+                                    } catch (Exception ex) {
+                                        MsgUtils.showToast("", MsgUtils.TOAST_TYPE_INTERNAL_ERROR, MsgUtils.ToastLength.LONG);
                                     }
-                                });
+                                }
+                            });
                         }
                         else{
                             putUser(user);
@@ -239,6 +243,7 @@ public class AccountEditFragment extends Fragment {
 
         return view;
     }
+
 
     public static class SelectDateFragment extends DialogFragment implements DatePickerDialog.OnDateSetListener {
 
@@ -480,8 +485,23 @@ public class AccountEditFragment extends Fragment {
 
         if (requestCode == GALLERY_REQUEST && resultCode == Activity.RESULT_OK){
             mImageUri = data.getData();
-
-            profilePicture.setImageURI(mImageUri);
+            CropImage.activity(mImageUri)
+                    .setAspectRatio(1,1)
+                    .setOutputCompressQuality(50)
+                    .setCropShape(CropImageView.CropShape.OVAL)
+                    .start(getContext(), this);
+//            mImageUri = data.getData();
+//            profilePicture.setImageURI(mImageUri);
+        }
+        if (requestCode == CropImage.CROP_IMAGE_ACTIVITY_REQUEST_CODE) {
+            CropImage.ActivityResult result = CropImage.getActivityResult(data);
+            if (resultCode == Activity.RESULT_OK) {
+                Uri resultUri = result.getUri();
+                profilePicture.setImageURI(resultUri);
+                mImageUri = resultUri;
+            } else if (resultCode == CropImage.CROP_IMAGE_ACTIVITY_RESULT_ERROR_CODE) {
+                Exception error = result.getError();
+            }
         }
     }
 
