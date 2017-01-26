@@ -64,6 +64,7 @@ public class ContactsFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
         MainActivity.setActionBarTitle(getString(R.string.Contact_List));
         View view = inflater.inflate(R.layout.fragment_contacts, container, false);
         contactsListView = (RecyclerView) view.findViewById(R.id.contactlist);

@@ -73,6 +73,8 @@ import timber.log.Timber;
 import com.facebook.FacebookSdk;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.FacebookAuthProvider;
+import com.twitter.sdk.android.core.TwitterCore;
+
 import static com.facebook.FacebookSdk.getApplicationContext;
 
 /**
@@ -97,7 +99,6 @@ public class LoginDialogFragment extends DialogFragment implements FacebookCallb
     private TextInputLayout loginEmailPasswordWrapper;
     private TextInputLayout loginEmailForgottenEmailWrapper;
     private FirebaseAuth mAuth;
-    private DigitsAuthButton digitsButton;
 
     /**
      * Creates dialog which handles user login, registration and forgotten password function.
@@ -176,8 +177,6 @@ public class LoginDialogFragment extends DialogFragment implements FacebookCallb
         loginRegistrationForm = (LinearLayout) view.findViewById(R.id.login_registration_form);
         loginEmailForm = (LinearLayout) view.findViewById(R.id.login_email_form);
         loginEmailForgottenForm = (LinearLayout) view.findViewById(R.id.login_email_forgotten_form);
-
-        digitsButton = (DigitsAuthButton) view.findViewById(R.id.auth_button);
 
 
         prepareLoginFormNavigation(view);
@@ -258,20 +257,6 @@ public class LoginDialogFragment extends DialogFragment implements FacebookCallb
             }
         });
 
-        //SMS
-        digitsButton.setCallback(new AuthCallback() {
-            @Override
-            public void success(DigitsSession session, String phoneNumber) {
-                // TODO: associate the session userID with your user model
-                Toast.makeText(getApplicationContext(), "Authentication successful for "
-                        + phoneNumber, Toast.LENGTH_LONG).show();
-            }
-
-            @Override
-            public void failure(DigitsException exception) {
-                Log.d("Digits", "Sign in with Digits failure", exception);
-            }
-        });
 
         // Registration
         TextView loginFormRegistrationButton = (TextView) view.findViewById(R.id.login_form_registration_btn);
@@ -442,6 +427,7 @@ public class LoginDialogFragment extends DialogFragment implements FacebookCallb
     }
 
     private void registerNewUser(EditText editTextEmail, EditText editTextPassword) {
+
         SettingsMy.setUserEmailHint(editTextEmail.getText().toString());
         progressDialog.show();
         try {
@@ -542,9 +528,9 @@ public class LoginDialogFragment extends DialogFragment implements FacebookCallb
     }
 
     private void handleUserLogin(User user) {
-        if (progressDialog != null) progressDialog.cancel();
         SettingsMy.setActiveUser(user);
-        digitsButton.onClick(getView());
+        if (progressDialog != null) progressDialog.cancel();
+
         // Invalidate GCM token for new registration with authorized user.
         SettingsMy.setTokenSentToServer(false);
 
@@ -554,6 +540,7 @@ public class LoginDialogFragment extends DialogFragment implements FacebookCallb
         MainActivity.invalidateDrawerMenuHeader();
 
         if (loginDialogInterface != null) {
+            
             loginDialogInterface.successfulLoginOrRegistration(user);
         } else {
             Timber.e("Interface is null");

@@ -47,6 +47,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.android.volley.Request;
 import com.android.volley.Response;
@@ -102,6 +103,7 @@ import timber.log.Timber;
 import io.fabric.sdk.android.*;
 import com.twitter.sdk.android.core.*;
 import com.digits.sdk.android.*;
+import com.twitter.sdk.android.core.internal.TwitterApi;
 
 
 import static com.android.volley.VolleyLog.TAG;
@@ -143,7 +145,8 @@ public class MainActivity extends AppCompatActivity implements DrawerFragment.Fr
     private FirebaseAuth mAuth;
     private FirebaseAuth.AuthStateListener mAuthListener;
     protected MyApplication mMyApplication;
-
+    private DigitsAuthButton digitsButton;
+    private int SMSValidationFailureCount = 0;
     /**
      * Refresh notification number of products in shopping cart.
      * Create action only if called from fragment attached to MainActivity.
@@ -211,7 +214,7 @@ public class MainActivity extends AppCompatActivity implements DrawerFragment.Fr
         super.onCreate(savedInstanceState);
         mInstance = this;
         mAuth = FirebaseAuth.getInstance();
-        mMyApplication = (MyApplication)this.getApplicationContext();
+        mMyApplication = (MyApplication) this.getApplicationContext();
         mMyApplication.setCurrentActivity(this);
 
 
@@ -222,6 +225,7 @@ public class MainActivity extends AppCompatActivity implements DrawerFragment.Fr
         MyApplication.setAppLocale(lang);
 
         setContentView(R.layout.activity_main);
+        digitsButton = (DigitsAuthButton) findViewById(R.id.auth_button);
 
 //        if (BuildConfig.DEBUG) {
 //            // Only debug properties, used for checking image memory management.
@@ -236,13 +240,30 @@ public class MainActivity extends AppCompatActivity implements DrawerFragment.Fr
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 FirebaseUser user = firebaseAuth.getCurrentUser();
                 if (user != null) {
+                    final User loginUser = new User();
+                    loginUser.setUid(user.getUid());
+                    UserController userController = new UserController(loginUser);
+                    userController.retrieveData(new UserController.completion() {
+                        @Override
+                        public void setResult(boolean result, User user) {
+                            if(result){
+                                manageSMSValidation(user);
+                            } else{
+                                manageSMSValidation(loginUser);
+                            }
+                        }
+                    });
                     // User is signed in
                     Log.d(TAG, "onAuthStateChanged:signed_in:" + user.getUid());
                 } else {
                     // User is signed out
                     SettingsMy.setActiveUser(null);
                     MainActivity.invalidateDrawerMenuHeader();
+                    try {
+                        Digits.getInstance().logout();
+                    }catch(Exception ex) {}
                     Log.d(TAG, "onAuthStateChanged:signed_out");
+
                 }
                 // ...
             }
@@ -298,8 +319,70 @@ public class MainActivity extends AppCompatActivity implements DrawerFragment.Fr
 
             Analytics.logOpenedByNotification(target);
         }
+
+        digitsButton.setCallback(new AuthCallback() {
+            @Override
+            public void success(DigitsSession session, final String phoneNumber) {
+                final User user = SettingsMy.getActiveUser();
+                user.setPhone(phoneNumber);
+                user.setPhoneValidated(true);
+                UserController userController = new UserController(user);
+                userController.save(new UserController.FirebaseCallResult() {
+                    @Override
+                    public void onComplete(boolean result) {
+                        if(result) {
+                            SettingsMy.setActiveUser(user);
+                        }
+                    }
+                });
+
+                /*FirebaseUser fbUser =  FirebaseAuth.getInstance().getCurrentUser();
+                final User user = new User();
+                if(fbUser!=null){
+                    user.setUid(fbUser.getUid());
+                }
+                if (user.getUid() != null) {
+                    final UserController userController = new UserController(user);
+                    userController.retrieveData(new UserController.completion() {
+                        @Override
+                        public void setResult(boolean result, final User user) {
+                            if(result){
+                                user.setPhone(phoneNumber);
+                                user.setPhoneValidated(true);
+                                userController.save(new UserController.FirebaseCallResult() {
+                                    @Override
+                                    public void onComplete(boolean result) {
+                                        SettingsMy.setActiveUser(user);
+                                        manageSMSValidation(user);
+                                        Toast.makeText(getApplicationContext(), getString(R.string.Authentication_successful_for) + phoneNumber, Toast.LENGTH_LONG).show();
+                                    }
+                                });
+                            }
+                        }
+                    });
+                } */
+            }
+
+            @Override
+            public void failure(DigitsException error) {
+                final User user = SettingsMy.getActiveUser();
+                manageSMSValidation(user);
+            }
+        });
     }
 
+    private void manageSMSValidation(User user) {
+        if(SMSValidationFailureCount>1){
+            UserController.signOut();
+            SMSValidationFailureCount = 0;
+            return;
+        }
+        if(user != null && !user.getPhoneValidated()){
+            SMSValidationFailureCount += 1;
+            //noinspection ResourceType
+            digitsButton.onClick(this.findViewById(R.layout.activity_main));
+        }
+    }
     /**
      * Run service for Gcm token generation and registering device on servers.
      * Registration is needed for notification messages.
@@ -771,6 +854,7 @@ public class MainActivity extends AppCompatActivity implements DrawerFragment.Fr
             @Override
             public void successfulLoginOrRegistration(User user) {
                 // If login was successful launch AccountEditFragment.
+
                 onAccountEditSelected();
             }
         });

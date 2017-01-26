@@ -180,4 +180,5 @@
     <string name="friends_group">Arkadaş Grubu</string>
     <string name="menu_action_refresh">refresh</string>
     <string name="menu_action_contacts">Kişiler</string>
+    <string name="Authentication_successful_for">Telefon doğrulama başarılı</string>
 </resources>

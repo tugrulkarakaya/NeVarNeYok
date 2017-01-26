@@ -31,4 +31,6 @@
         android:orderInCategory="10001"
         android:title="@string/menu_action_refresh"
         app:showAsAction="ifRoom"/>
+
 </menu>
+

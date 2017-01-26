@@ -11,6 +11,7 @@ import uk.co.nevarneyok.entities.User;
 import uk.co.nevarneyok.utils.MsgUtils;
 import uk.co.nevarneyok.ux.MainActivity;
 
+import com.digits.sdk.android.Digits;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -18,6 +19,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
+import com.twitter.sdk.android.core.TwitterCore;
 
 
 public class UserController  {
@@ -157,6 +159,7 @@ public class UserController  {
             FirebaseAuth.getInstance().signOut();
             SettingsMy.setActiveUser(null);
             MainActivity.invalidateDrawerMenuHeader();
+            Digits.getInstance().logout();
         } catch(Exception ex){
             MsgUtils.showToast(R.string.Sign_out_error, MsgUtils.TOAST_TYPE_MESSAGE, MsgUtils.ToastLength.LONG);
         }
