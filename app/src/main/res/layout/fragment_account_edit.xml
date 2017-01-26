@@ -91,10 +91,11 @@
                         android:id="@+id/account_edit_phone_et"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
+                        android:enabled="false"
                         android:hint="@string/Phone"
                         android:inputType="phone"
                         android:singleLine="true"
-                        android:textColor="@color/textPrimary"/>
+                        android:textColor="@color/textSecondary"/>
                 </android.support.design.widget.TextInputLayout>
 
                 <android.support.design.widget.TextInputLayout
