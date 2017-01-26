@@ -1,19 +1,28 @@
 package uk.co.nevarneyok.ux.fragments;
 
+import android.Manifest;
 import android.app.ProgressDialog;
 import android.content.ContentResolver;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.ContactsContract;
+import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -47,6 +56,7 @@ public class ContactsFragment extends Fragment {
     private ProgressDialog pDialog;
     private Handler updateBarHandler;
 
+
     DatabaseReference myRef=FirebaseDatabase.getInstance().getReference();
     DatabaseReference pushRef;
 
@@ -55,6 +65,11 @@ public class ContactsFragment extends Fragment {
     private RecyclerView contactsListView;
     User activeUser = SettingsMy.getActiveUser();
 
+    String[] permission = {
+            android.Manifest.permission.READ_CONTACTS
+    };
+    int CONTACTS_READ_CODE = 67;
+    private FrameLayout framelayout;
 
     public ContactsFragment() {
         // Required empty public constructor
@@ -79,6 +94,7 @@ public class ContactsFragment extends Fragment {
         myFirebaseRef=myRef.child("contacts");
         myQueryRef = myFirebaseRef.orderByChild("name");
         myQueryRef.keepSynced(true);
+        framelayout = (FrameLayout) view.findViewById(R.id.framelayout);
 
         // Inflate the layout for this fragment
         return view;
@@ -140,39 +156,98 @@ public class ContactsFragment extends Fragment {
         }
 
         if(activeUser != null){
-            final CallingContacts callingContacts=new CallingContacts();
-            callingContacts.existsData(new CallingContacts.completion() {
-                @Override
-                public void setResult(boolean result) {
-                    if(!result){
-                        pDialog.setMessage("Reading contacts...");
-                        pDialog.setCancelable(false);
-                        pDialog.show();
-                        new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                getContacts(false);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+
+                if (ContextCompat.checkSelfPermission(getContext(), android.Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED) {
+                    //-- Eğer almak istediğimiz izinler daha önceden kullanıcı tarafından onaylanmış ise bu kısımda istediğimiz işlemleri yapabiliriz..
+                    //-- Mesela uygulama açılışında SD Kart üzerindeki herhangi bir dosyaya bu kısımda erişebiliriz.
+                    final CallingContacts callingContacts=new CallingContacts();
+                    callingContacts.existsData(new CallingContacts.completion() {
+                        @Override
+                        public void setResult(boolean result) {
+                            if(!result){
+                                pDialog.setMessage("Reading contacts...");
+                                pDialog.setCancelable(false);
+                                pDialog.show();
+                                new Thread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        getContacts(false);
+                                    }
+                                }).start();
                             }
-                        }).start();
-                    }
-                    else{
-//                        pDialog.setMessage("Reading contacts...");
-//                        pDialog.setCancelable(false);
-//                        pDialog.show();
-                        new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                getContacts(true);
-                                callingContacts.refreshContacts(contactlist);
+                            else{
+                                new Thread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        getContacts(true);
+                                        callingContacts.refreshContacts(contactlist);
+                                    }
+                                }).start();
                             }
-                        }).start();
-                    }
+                        }
+                    });
+
+                } else {
+                    //-- Almak istediğimiz izinler daha öncesinde kullanıcı tarafından onaylanmamış ise bu kod bloğu harekete geçecektir.
+                    //-- Burada requestPermissions() metodu ile kullanıcıdan ilgili Manifest izinlerini onaylamasını istiyoruz.
+
+                    requestPermissions(permission, CONTACTS_READ_CODE);
+
                 }
-            });
+
+            }
+
         }
+    }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case 67: {
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
 
+                    final CallingContacts callingContacts=new CallingContacts();
+                    callingContacts.existsData(new CallingContacts.completion() {
+                        @Override
+                        public void setResult(boolean result) {
+                            if(!result){
+                                pDialog.setMessage("Reading contacts...");
+                                pDialog.setCancelable(false);
+                                pDialog.show();
+                                new Thread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        getContacts(false);
+                                    }
+                                }).start();
+                            }
+                            else{
+                                new Thread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        getContacts(true);
+                                        callingContacts.refreshContacts(contactlist);
+                                    }
+                                }).start();
+                            }
+                        }
+                    });
 
+                } else {
+
+                    Snackbar snackbar = Snackbar
+                            .make(framelayout, "Uygulamayı daha iyi kullanabilmek için bu izin gereklidir.", Snackbar.LENGTH_LONG);
+                    View sbView = snackbar.getView();
+                    TextView textView = (TextView) sbView.findViewById(android.support.design.R.id.snackbar_text);
+                    textView.setTextColor(Color.YELLOW);
+                    snackbar.show();
+
+                }
+                return;
+            }
+        }
     }
 
     public void getContacts(final boolean refresh) {
