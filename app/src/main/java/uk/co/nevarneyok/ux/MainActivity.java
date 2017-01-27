@@ -83,6 +83,7 @@ import uk.co.nevarneyok.utils.MsgUtils;
 import uk.co.nevarneyok.utils.MyRegistrationIntentService;
 import uk.co.nevarneyok.utils.Utils;
 import uk.co.nevarneyok.ux.dialogs.LoginDialogFragment;
+import uk.co.nevarneyok.ux.dialogs.LoginExpiredDialogFragment;
 import uk.co.nevarneyok.ux.fragments.AccountEditFragment;
 import uk.co.nevarneyok.ux.fragments.AccountFragment;
 import uk.co.nevarneyok.ux.fragments.BannersFragment;
@@ -345,8 +346,9 @@ public class MainActivity extends AppCompatActivity implements DrawerFragment.Fr
                             });
                         } else {
                             //aynı telefon başka bir hesaba eklenemez.
-                            MsgUtils.showToast(getString(R.string.phone_double_registration_error) + " " + user.getEmail(), MsgUtils.TOAST_TYPE_MESSAGE, MsgUtils.ToastLength.LONG);
+                            MsgUtils.showToast(getString(R.string.phone_double_registration_error), MsgUtils.TOAST_TYPE_MESSAGE, MsgUtils.ToastLength.LONG);
                             UserController.signOut();
+                            replaceFragment(new LoginExpiredDialogFragment(),LoginExpiredDialogFragment.class.getSimpleName());
                         }
                     }
 
@@ -356,6 +358,7 @@ public class MainActivity extends AppCompatActivity implements DrawerFragment.Fr
 
             @Override
             public void failure(DigitsException error) {
+                SMSValidationFailureCount += 1;
                 final User user = SettingsMy.getActiveUser();
                 manageSMSValidation(user);
             }
@@ -363,9 +366,10 @@ public class MainActivity extends AppCompatActivity implements DrawerFragment.Fr
     }
 
     private void manageSMSValidation(User user) {
-        if(SMSValidationFailureCount>1){
+        if(SMSValidationFailureCount>2){
             UserController.signOut();
             SMSValidationFailureCount = 0;
+            addInitialFragment();
             return;
         }
 
@@ -375,7 +379,6 @@ public class MainActivity extends AppCompatActivity implements DrawerFragment.Fr
         }
 
         if(user != null && !user.getPhoneValidated()){
-            SMSValidationFailureCount += 1;
             //noinspection ResourceType
             digitsButton.onClick(this.findViewById(R.layout.activity_main));
         }
@@ -740,6 +743,10 @@ public class MainActivity extends AppCompatActivity implements DrawerFragment.Fr
     public void onAccountSelected() {
         AccountFragment fragment = new AccountFragment();
         replaceFragment(fragment, AccountFragment.class.getSimpleName());
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
     }
 
     /**
