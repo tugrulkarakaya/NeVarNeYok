@@ -224,5 +224,10 @@
     <string name="save_error">an error occurred while saving</string>
     <string name="Saving">Saving...</string>
     <string name="Authentication_successful_for">Authentication successful for</string>
+    <string name="removed_from_list">Removed from list.</string>
+    <string name="undo">UNDO</string>
+    <string name="permissio_required">This permission is required before you can use the app.</string>
+    <string name="reading_contacts">Reading contacts</string>
+    <string name="added_to_list">Added to list</string>
 
 </resources>

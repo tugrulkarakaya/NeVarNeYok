@@ -181,4 +181,9 @@
     <string name="menu_action_refresh">refresh</string>
     <string name="menu_action_contacts">Kişiler</string>
     <string name="Authentication_successful_for">Telefon doğrulama başarılı</string>
+    <string name="added_to_list">Listeye eklendi</string>
+    <string name="permissio_required">Uygulamayı kullanabilmeniz için bu izin gereklidir.</string>
+    <string name="reading_contacts">Rehber okunuyor</string>
+    <string name="removed_from_list">Listeden silindi.</string>
+    <string name="undo">GERİ AL</string>
 </resources>

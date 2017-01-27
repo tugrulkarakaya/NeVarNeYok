@@ -69,7 +69,7 @@ public class ContactsFragment extends Fragment {
             android.Manifest.permission.READ_CONTACTS
     };
     int CONTACTS_READ_CODE = 67;
-    private FrameLayout framelayout;
+    private static FrameLayout framelayout;
 
     public ContactsFragment() {
         // Required empty public constructor
@@ -124,8 +124,12 @@ public class ContactsFragment extends Fragment {
                 public void onClick(View view) {
                     callingContacts.addCallingGroup("friends",key, contact);
                     callingContacts.checkFriendsGroup(contact.getPhone(),key);
-                    Toast.makeText(mView.getContext(), "Aranacaklar Listesine Eklendi.",
-                            Toast.LENGTH_SHORT).show();
+                    Snackbar snackbar = Snackbar
+                            .make(framelayout, R.string.added_to_list, Snackbar.LENGTH_LONG);
+                    View sbView = snackbar.getView();
+                    TextView textView = (TextView) sbView.findViewById(android.support.design.R.id.snackbar_text);
+                    textView.setTextColor(Color.WHITE);
+                    snackbar.show();
                 }
             });
         }
@@ -166,7 +170,7 @@ public class ContactsFragment extends Fragment {
                         @Override
                         public void setResult(boolean result) {
                             if(!result){
-                                pDialog.setMessage("Reading contacts...");
+                                pDialog.setMessage(R.string.reading_contacts+"...");
                                 pDialog.setCancelable(false);
                                 pDialog.show();
                                 new Thread(new Runnable() {
@@ -213,7 +217,7 @@ public class ContactsFragment extends Fragment {
                         @Override
                         public void setResult(boolean result) {
                             if(!result){
-                                pDialog.setMessage("Reading contacts...");
+                                pDialog.setMessage(R.string.reading_contacts+"...");
                                 pDialog.setCancelable(false);
                                 pDialog.show();
                                 new Thread(new Runnable() {
@@ -238,7 +242,7 @@ public class ContactsFragment extends Fragment {
                 } else {
 
                     Snackbar snackbar = Snackbar
-                            .make(framelayout, "Uygulamayı daha iyi kullanabilmek için bu izin gereklidir.", Snackbar.LENGTH_LONG);
+                            .make(framelayout, R.string.permissio_required, Snackbar.LENGTH_LONG);
                     View sbView = snackbar.getView();
                     TextView textView = (TextView) sbView.findViewById(android.support.design.R.id.snackbar_text);
                     textView.setTextColor(Color.YELLOW);
@@ -271,7 +275,7 @@ public class ContactsFragment extends Fragment {
                 // Update the progress message
                 updateBarHandler.post(new Runnable() {
                     public void run() {
-                        pDialog.setMessage("Reading contacts : "+ counter++ +"/"+cursor.getCount());
+                        pDialog.setMessage(R.string.reading_contacts+" : "+ counter++ +"/"+cursor.getCount());
                     }
                 });
                 String contact_id = cursor.getString(cursor.getColumnIndex( _ID ));
@@ -307,13 +311,6 @@ public class ContactsFragment extends Fragment {
             getActivity().runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    Collections.sort(contactlist, new Comparator<Contact>() {
-                        @Override
-                        public int compare(Contact contact, Contact t1) {
-                            Collator trCollator = Collator.getInstance(new Locale("tr", "TR"));
-                            return trCollator.compare(contact.getName(),t1.getName());
-                        }
-                    });
                     for (int i=0; i<contactlist.size();i++){
                         for (int j=i+1; j<contactlist.size();j++){
                             if(contactlist.get(i).getName().equals(contactlist.get(j).getName()) &&

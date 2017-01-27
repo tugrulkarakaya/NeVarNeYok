@@ -1,7 +1,9 @@
 package uk.co.nevarneyok.ux.fragments;
 
 
+import android.graphics.Color;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -44,6 +46,8 @@ public class FriendsGroupFragment extends Fragment {
 
     User activeUser = SettingsMy.getActiveUser();
 
+    private static FrameLayout framelayout;
+
     public FriendsGroupFragment() {
         // Required empty public constructor
     }
@@ -64,6 +68,8 @@ public class FriendsGroupFragment extends Fragment {
         myFirebaseRef=myRef.child("callinggroups").child("friends");
         myQueryRef = myFirebaseRef.orderByChild("name");
         myQueryRef.keepSynced(true);
+
+        framelayout = (FrameLayout) view.findViewById(R.id.framelayout);
 
         return view;
     }
@@ -101,15 +107,31 @@ public class FriendsGroupFragment extends Fragment {
                 contact_photo.setBackgroundResource(R.drawable.user_black);
             }
         }
-        public void setRemove(final String key){
+        public void setRemove(final String key , final Contact contact){
             ImageView contact_add_remove = (ImageView) mView.findViewById(R.id.contact_add_remove);
             contact_add_remove.setBackgroundResource(R.drawable.ic_remove_circle_outline_black_24dp);
             contact_add_remove.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     callingContacts.removeCallingGroup("friends",key);
-                    Toast.makeText(mView.getContext(), "Aranacaklar Listesinden Çıkartıldı.",
-                            Toast.LENGTH_SHORT).show();
+
+                    Snackbar snackbar = Snackbar
+                            .make(framelayout, R.string.removed_from_list, Snackbar.LENGTH_LONG)
+                            .setAction(R.string.undo, new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    callingContacts.addCallingGroup("friends",key, contact);
+                                }
+                            });
+                    snackbar.setActionTextColor(Color.RED);
+
+                    View sbView = snackbar.getView();
+                    TextView textView = (TextView) sbView.findViewById(android.support.design.R.id.snackbar_text);
+                    textView.setTextColor(Color.WHITE);
+                    snackbar.show();
+
+//                    Toast.makeText(mView.getContext(), "Aranacaklar Listesinden Çıkartıldı.",
+//                            Toast.LENGTH_SHORT).show();
                 }
             });
         }
@@ -132,7 +154,7 @@ public class FriendsGroupFragment extends Fragment {
                     viewHolder.setName(model.getName());
                     viewHolder.setPhone(model.getPhone());
                     viewHolder.setPhoto(model.getPhotoUrl());
-                    viewHolder.setRemove(getRef(position).getKey());
+                    viewHolder.setRemove(getRef(position).getKey(), model);
                     if(model.getUid()==null || model.getPhotoUrl()==null){
                         final CallingContacts callingContacts=new CallingContacts();
                         callingContacts.checkFriendsGroup(model.getPhone(),getRef(position).getKey());
