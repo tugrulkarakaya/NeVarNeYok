@@ -26,7 +26,7 @@ import uk.co.nevarneyok.utils.MsgUtils;
 
 public class CallingContacts {
     User activeUser = SettingsMy.getActiveUser();
-    DatabaseReference myRef = FirebaseDatabase.getInstance().getReference("contacts").child(activeUser.getUid()).child("callinggroups");
+    DatabaseReference myRef =  FirebaseDatabase.getInstance().getReference("contacts").child(activeUser.getUid()).child("callinggroups");
     DatabaseReference getFirReference = FirebaseDatabase.getInstance().getReference("contacts").child(activeUser.getUid());
     DatabaseReference pushRef;
     Query myQueryRef;

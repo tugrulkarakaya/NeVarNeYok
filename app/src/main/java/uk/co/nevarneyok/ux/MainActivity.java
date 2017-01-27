@@ -147,6 +147,7 @@ public class MainActivity extends AppCompatActivity implements DrawerFragment.Fr
     protected MyApplication mMyApplication;
     private DigitsAuthButton digitsButton;
     private int SMSValidationFailureCount = 0;
+    private boolean initialized = false;
     /**
      * Refresh notification number of products in shopping cart.
      * Create action only if called from fragment attached to MainActivity.
@@ -258,6 +259,7 @@ public class MainActivity extends AppCompatActivity implements DrawerFragment.Fr
                 } else {
                     // User is signed out
                     SettingsMy.setActiveUser(null);
+                    addInitialFragment();
                     MainActivity.invalidateDrawerMenuHeader();
                     try {
                         Digits.getInstance().logout();
@@ -304,7 +306,7 @@ public class MainActivity extends AppCompatActivity implements DrawerFragment.Fr
         registerGcmOnServer();
         // end of GCM registration //
 
-        addInitialFragment();
+        //addInitialFragment();
 
         // Opened by notification with some data
         if (this.getIntent() != null && this.getIntent().getExtras() != null) {
@@ -324,43 +326,32 @@ public class MainActivity extends AppCompatActivity implements DrawerFragment.Fr
             @Override
             public void success(DigitsSession session, final String phoneNumber) {
                 final User user = SettingsMy.getActiveUser();
+                if(user == null)
+                    return;
                 user.setPhone(phoneNumber);
                 user.setPhoneValidated(true);
-                UserController userController = new UserController(user);
-                userController.save(new UserController.FirebaseCallResult() {
+                final UserController userController = new UserController(user);
+                userController.getUserbyPhoneNumber(phoneNumber, new UserController.completion() {
                     @Override
-                    public void onComplete(boolean result) {
-                        if(result) {
-                            SettingsMy.setActiveUser(user);
+                    public void setResult(boolean result, final User user) {
+                        if (!result) {
+                            userController.save(new UserController.FirebaseCallResult() {
+                                @Override
+                                public void onComplete(boolean result) {
+                                    if (result) {
+                                        SettingsMy.setActiveUser(user);
+                                    }
+                                }
+                            });
+                        } else {
+                            //aynı telefon başka bir hesaba eklenemez.
+                            MsgUtils.showToast(getString(R.string.phone_double_registration_error) + " " + user.getEmail(), MsgUtils.TOAST_TYPE_MESSAGE, MsgUtils.ToastLength.LONG);
+                            UserController.signOut();
                         }
                     }
+
                 });
 
-                /*FirebaseUser fbUser =  FirebaseAuth.getInstance().getCurrentUser();
-                final User user = new User();
-                if(fbUser!=null){
-                    user.setUid(fbUser.getUid());
-                }
-                if (user.getUid() != null) {
-                    final UserController userController = new UserController(user);
-                    userController.retrieveData(new UserController.completion() {
-                        @Override
-                        public void setResult(boolean result, final User user) {
-                            if(result){
-                                user.setPhone(phoneNumber);
-                                user.setPhoneValidated(true);
-                                userController.save(new UserController.FirebaseCallResult() {
-                                    @Override
-                                    public void onComplete(boolean result) {
-                                        SettingsMy.setActiveUser(user);
-                                        manageSMSValidation(user);
-                                        Toast.makeText(getApplicationContext(), getString(R.string.Authentication_successful_for) + phoneNumber, Toast.LENGTH_LONG).show();
-                                    }
-                                });
-                            }
-                        }
-                    });
-                } */
             }
 
             @Override
@@ -377,6 +368,12 @@ public class MainActivity extends AppCompatActivity implements DrawerFragment.Fr
             SMSValidationFailureCount = 0;
             return;
         }
+
+        if(user != null && user.getPhoneValidated()){
+            SMSValidationFailureCount = 0;
+            addInitialFragment();
+        }
+
         if(user != null && !user.getPhoneValidated()){
             SMSValidationFailureCount += 1;
             //noinspection ResourceType
@@ -646,12 +643,15 @@ public class MainActivity extends AppCompatActivity implements DrawerFragment.Fr
      * When fragment stack is cleared {@link #clearBackStack}, this fragment will be shown.
      */
     private void addInitialFragment() {
+        if(!initialized) {
 //        Fragment fragment = new BannersFragment();
-        Fragment fragment = new ContactsFragment();
-        FragmentManager frgManager = getSupportFragmentManager();
-        FragmentTransaction fragmentTransaction = frgManager.beginTransaction();
-        fragmentTransaction.add(R.id.main_content_frame, fragment).commit();
-        frgManager.executePendingTransactions();
+            Fragment fragment = new ContactsFragment();
+            FragmentManager frgManager = getSupportFragmentManager();
+            FragmentTransaction fragmentTransaction = frgManager.beginTransaction();
+            fragmentTransaction.add(R.id.main_content_frame, fragment).commit();
+            frgManager.executePendingTransactions();
+            initialized = true;
+        }
     }
 
     /**

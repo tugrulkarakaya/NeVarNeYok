@@ -14,9 +14,11 @@ import uk.co.nevarneyok.ux.MainActivity;
 import com.digits.sdk.android.Digits;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
 import com.twitter.sdk.android.core.TwitterCore;
@@ -152,6 +154,25 @@ public class UserController  {
             MsgUtils.showToast(R.string.data_retrieve_error, MsgUtils.TOAST_TYPE_MESSAGE, MsgUtils.ToastLength.LONG);
             callResult.setResult(false, user);
         }
+    }
+    public static void getUserbyPhoneNumber(String phoneNumber, final completion callResult) {
+        Query query = FIRDataServices.DBUserRef.orderByChild("phone").equalTo(phoneNumber);
+        query.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    User user = dataSnapshot.getValue(User.class);
+                    callResult.setResult(true, user);
+                } else {
+                    callResult.setResult(false, null);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                callResult.setResult(false, null);
+            }
+        });
     }
 
     public static void signOut(){

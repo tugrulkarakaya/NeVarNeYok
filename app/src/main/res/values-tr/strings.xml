@@ -186,4 +186,5 @@
     <string name="reading_contacts">Rehber okunuyor</string>
     <string name="removed_from_list">Listeden silindi.</string>
     <string name="undo">GERİ AL</string>
+    <string name="phone_double_registration_error">Verilen telefon başka bir hesaba kayıtlı. Oturumunuz sonlandırılacaktır.</string>
 </resources>

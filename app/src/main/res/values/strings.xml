@@ -229,5 +229,6 @@
     <string name="permissio_required">This permission is required before you can use the app.</string>
     <string name="reading_contacts">Reading contacts</string>
     <string name="added_to_list">Added to list</string>
+    <string name="phone_double_registration_error">Given phone number has already been registered to another account. You will be logged out.</string>
 
 </resources>
