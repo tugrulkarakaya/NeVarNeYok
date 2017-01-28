@@ -38,9 +38,6 @@ public class TokBoxJWTRequest extends JsonRequest {
     private static final String HMAC_SHA1_ALGORITHM = "HmacSHA1";
 
     private final String accessToken;
-    private int requestStatusCode;
-    private FragmentManager fragmentManager;
-    private String requestUrl;
 
 
     /**
@@ -55,8 +52,6 @@ public class TokBoxJWTRequest extends JsonRequest {
      */
     public TokBoxJWTRequest( JSONObject jsonRequest, Response.Listener<JSONObject> successListener, Response.ErrorListener errorListener, FragmentManager fragmentManager, String accessToken) {
         super(Method.POST, tokBoxUrl, jsonRequest, successListener, errorListener, fragmentManager, accessToken);
-        this.requestUrl = requestUrl;
-        this.fragmentManager = fragmentManager;
         this.accessToken = accessToken;
     }
 
@@ -74,7 +69,7 @@ public class TokBoxJWTRequest extends JsonRequest {
         }
         return headers;
     }
-    public static String getJWT() {
+    protected static String getJWT() {
         final long ONE_MINUTE_IN_MILLIS=1000;
         long t= Calendar.getInstance().getTimeInMillis();
         Date currentTime=new Date(t);

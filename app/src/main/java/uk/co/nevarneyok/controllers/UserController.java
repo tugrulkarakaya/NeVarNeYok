@@ -43,7 +43,9 @@ public class UserController  {
                 String newKey = FIRDataServices.DBUserRef.push().getKey();
                 user.setUid(newKey);
             }
-            return FIRDataServices.DBUserRef.child(user.getUid());
+            DatabaseReference ref = FIRDataServices.DBUserRef.child(user.getUid());
+            ref.keepSynced(true);
+            return ref;
         }
         catch(Exception ex){
             MsgUtils.showToast("", MsgUtils.TOAST_TYPE_INTERNAL_ERROR, MsgUtils.ToastLength.LONG);

@@ -7,9 +7,9 @@ import com.google.firebase.storage.StorageReference;
 
 
 public class FIRDataServices {
-    public static FirebaseDatabase DBBase =FirebaseDatabase.getInstance();
-    public static DatabaseReference DBUserRef = DBBase.getReference().child("users");
-    public static StorageReference StorageBase = FirebaseStorage.getInstance().getReference();
-    public static StorageReference StorageUser = StorageBase.child("users");
+    public final static FirebaseDatabase DBBase =FirebaseDatabase.getInstance();
+    public final static DatabaseReference DBUserRef = DBBase.getReference().child("users");
+    public final static StorageReference StorageBase = FirebaseStorage.getInstance().getReference();
+    public final static StorageReference StorageUser = StorageBase.child("users");
 
 }

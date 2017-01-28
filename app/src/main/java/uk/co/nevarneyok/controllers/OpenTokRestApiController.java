@@ -115,7 +115,7 @@ public class OpenTokRestApiController extends AsyncTask<String, Void, String> {
 
     public static String CreateToken(String sessionId, String role, String data, long expireInMinutes) throws NoSuchAlgorithmException, SignatureException, InvalidKeyException {
         String token="";
-        double timeNow = Math.floor(Calendar.getInstance().getTimeInMillis()/1000);
+        double timeNow = Math.floor(Calendar.getInstance().getTimeInMillis()/(double)1000);
         double expire= timeNow + (expireInMinutes * 60);
         double rand =  Math.random() * 999999;
         String dataString;
