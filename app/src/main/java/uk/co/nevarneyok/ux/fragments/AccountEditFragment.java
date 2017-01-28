@@ -330,11 +330,11 @@ public class AccountEditFragment extends Fragment {
         // Check and show all missing values
         String fieldRequired = getString(R.string.Required_field);
         boolean nameCheck = Utils.checkTextInputLayoutValueRequirement(nameInputWrapper, fieldRequired);
-        boolean phoneCheck = Utils.checkTextInputLayoutValueRequirement(phoneInputWrapper, fieldRequired);
+        //boolean phoneCheck = Utils.checkTextInputLayoutValueRequirement(phoneInputWrapper, fieldRequired);
         boolean birthDateCheck = Utils.checkTextInputLayoutValueRequirement(birthDateInputWrapper, fieldRequired);
-        boolean emailCheck = Utils.checkTextInputLayoutValueRequirement(emailInputWrapper, fieldRequired);
+        //boolean emailCheck = Utils.checkTextInputLayoutValueRequirement(emailInputWrapper, fieldRequired);
 
-        return nameCheck && birthDateCheck && phoneCheck && emailCheck;
+        return nameCheck && birthDateCheck;
     }
 
     /**
@@ -386,6 +386,7 @@ public class AccountEditFragment extends Fragment {
                                     progressDialog.cancel();
                                     MsgUtils.showToast(getActivity(), MsgUtils.TOAST_TYPE_MESSAGE, getString(R.string.Ok), MsgUtils.ToastLength.SHORT);
                                     getFragmentManager().popBackStackImmediate();
+                                    MainActivity.invalidateDrawerMenuHeader();
                                 } else {
                                     if (progressDialog != null) progressDialog.cancel();
                                     JSONObject json = new JSONObject();
