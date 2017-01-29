@@ -441,7 +441,7 @@ public class LoginDialogFragment extends DialogFragment implements FacebookCallb
                             // signed in user can be handled in the listener.
                             if (!task.isSuccessful()) {
                                 Timber.d(MSG_RESPONSE, "Parse new user registration failed");
-                                MsgUtils.showToast(getActivity(), MsgUtils.TOAST_TYPE_INTERNAL_ERROR, null, MsgUtils.ToastLength.SHORT);
+                                MsgUtils.showToast(task.getException().getLocalizedMessage(), MsgUtils.TOAST_TYPE_MESSAGE, MsgUtils.ToastLength.LONG);
                                 if (progressDialog != null) progressDialog.cancel();
                                 return;
                             }
@@ -461,7 +461,7 @@ public class LoginDialogFragment extends DialogFragment implements FacebookCallb
                     });
         } catch (Exception ex) {
             if (progressDialog != null) progressDialog.cancel();
-            MsgUtils.showToast("", MsgUtils.TOAST_TYPE_INTERNAL_ERROR, MsgUtils.ToastLength.LONG);
+            MsgUtils.showToast(ex.getLocalizedMessage(), MsgUtils.TOAST_TYPE_MESSAGE, MsgUtils.ToastLength.LONG);
         }
     }
 
@@ -493,7 +493,7 @@ public class LoginDialogFragment extends DialogFragment implements FacebookCallb
                         // signed in user can be handled in the listener.
                         if (!task.isSuccessful()) {
                             if (progressDialog != null) progressDialog.cancel();
-                            MsgUtils.showToast(getActivity(), MsgUtils.TOAST_TYPE_MESSAGE, null, MsgUtils.ToastLength.LONG);
+                            MsgUtils.showToast(task.getException().getLocalizedMessage(), MsgUtils.TOAST_TYPE_MESSAGE, MsgUtils.ToastLength.LONG);
                         }
                         else{
                             //get user details here
