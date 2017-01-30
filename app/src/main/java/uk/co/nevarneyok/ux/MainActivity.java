@@ -69,6 +69,7 @@ import uk.co.nevarneyok.SettingsMy;
 import uk.co.nevarneyok.api.EndPoints;
 import uk.co.nevarneyok.api.GsonRequest;
 import uk.co.nevarneyok.api.JsonRequest;
+import uk.co.nevarneyok.api.SoapRequest;
 import uk.co.nevarneyok.controllers.UserController;
 import uk.co.nevarneyok.entities.Banner;
 import uk.co.nevarneyok.entities.User;
@@ -654,6 +655,7 @@ public class MainActivity extends AppCompatActivity implements DrawerFragment.Fr
             fragmentTransaction.add(R.id.main_content_frame, fragment).commit();
             frgManager.executePendingTransactions();
             initialized = true;
+            invokeAsyncTask();
         }
     }
 
@@ -965,4 +967,17 @@ public class MainActivity extends AppCompatActivity implements DrawerFragment.Fr
         if (this.equals(currActivity))
             mMyApplication.setCurrentActivity(null);
     }
+
+    //create and execute asynctask to get response from W3school server
+    private void invokeAsyncTask()//String soapAction, String methodName, String convertParams) {
+    {
+        SoapRequest request = new SoapRequest("http://karincasoft.com/KRNC_WS/Login09/gfGet_AuthorizationTicket", "http://acente.turaturizm.com.tr/KRNC_WS/WS/Login09.asmx", "http://karincasoft.com/KRNC_WS/Login09", "gfGet_AuthorizationTicket", "sTurop,sUser,sPass", new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+
+            }
+        });
+        request.execute();
+    }
+
 }
