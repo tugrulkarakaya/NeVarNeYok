@@ -231,4 +231,7 @@
     <string name="added_to_list">Added to list</string>
     <string name="phone_double_registration_error">Given phone number has already been registered to another account. You will be logged out.</string>
 
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+
 </resources>
