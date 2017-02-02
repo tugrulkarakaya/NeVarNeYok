@@ -17,6 +17,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -30,6 +31,7 @@ import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
+import com.google.firebase.iid.FirebaseInstanceId;
 import com.squareup.picasso.Picasso;
 
 import java.text.Collator;
@@ -70,7 +72,7 @@ public class ContactsFragment extends Fragment {
     };
     int CONTACTS_READ_CODE = 67;
     private static FrameLayout framelayout;
-
+    private static final String TAG = "MyFirebaseIIDService";
     public ContactsFragment() {
         // Required empty public constructor
     }
@@ -79,7 +81,8 @@ public class ContactsFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
+        String refreshedToken = FirebaseInstanceId.getInstance().getToken();
+        Log.d(TAG, "Refreshed token: " + refreshedToken);
         MainActivity.setActionBarTitle(getString(R.string.Contact_List));
         View view = inflater.inflate(R.layout.fragment_contacts, container, false);
         contactsListView = (RecyclerView) view.findViewById(R.id.contactlist);
@@ -119,6 +122,10 @@ public class ContactsFragment extends Fragment {
         public void setAdd(final String key, final Contact contact){
             ImageView contact_add_remove = (ImageView) mView.findViewById(R.id.contact_add_remove);
             contact_add_remove.setBackgroundResource(R.drawable.ic_add_circle_outline_black_24dp);
+            if(contact.isAdded()){
+                mView.setBackgroundColor(Color.LTGRAY);
+                contact_add_remove.setEnabled(false);
+            }
             contact_add_remove.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {

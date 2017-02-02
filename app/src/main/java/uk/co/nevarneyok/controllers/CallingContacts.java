@@ -47,15 +47,29 @@ public class CallingContacts {
     public void addCallingGroup(String groupName, String contactsKey, Contact contact){
         try {
             myRef.child(groupName).child(contactsKey).setValue(contact);
+            getFirReference.child("contacts").child(contactsKey).child("added").setValue(true);
         }catch(Exception ex){
             MsgUtils.showToast("", MsgUtils.TOAST_TYPE_INTERNAL_ERROR, MsgUtils.ToastLength.LONG);
         }
 
     }
 
-    public void removeCallingGroup(String groupName, String contactsKey){
+    public void removeCallingGroup(final String groupName, final String contactsKey){
         try{
             myRef.child(groupName).child(contactsKey).removeValue();
+            getFirReference.child("contacts").child(contactsKey).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    if(dataSnapshot.exists()){
+                        getFirReference.child("contacts").child(contactsKey).child("added").setValue(false);
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
         }catch(Exception ex){
             MsgUtils.showToast("", MsgUtils.TOAST_TYPE_INTERNAL_ERROR, MsgUtils.ToastLength.LONG);
         }

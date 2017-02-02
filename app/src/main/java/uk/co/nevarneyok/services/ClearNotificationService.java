@@ -1,4 +1,4 @@
-package uk.co.nevarneyok.Service;
+package uk.co.nevarneyok.services;
 
 import android.app.NotificationManager;
 import android.app.Service;

@@ -6,14 +6,16 @@ package uk.co.nevarneyok.entities;
 
 public class Contact {
     private String name, phone, photoUrl, uid;
+    private boolean added=false;
 
     public Contact(){}
 
-    public Contact(String name, String phone, String photoUrl, String uid) {
+    public Contact(String name, String phone, String photoUrl, String uid, boolean added) {
         this.name = name;
         this.phone = phone;
         this.photoUrl = photoUrl;
         this.uid = uid;
+        this.added=added;
     }
 
     public String getName() {
@@ -46,5 +48,13 @@ public class Contact {
 
     public void setUid(String uid) {
         this.uid = uid;
+    }
+
+    public boolean isAdded() {
+        return added;
+    }
+
+    public void setAdded(boolean added) {
+        this.added = added;
     }
 }
