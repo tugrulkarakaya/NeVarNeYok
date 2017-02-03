@@ -131,7 +131,7 @@ dependencies {
     compile 'com.google.firebase:firebase-messaging:10.0.1'
     compile 'com.firebaseui:firebase-ui-database:1.0.0'
     compile 'com.android.support:support-v4:25.1.0'
-    compile 'com.opentok.android:opentok-android-sdk:2.10.+'
+    compile 'com.opentok.android:opentok-android-sdk:2.10.0-REL-2706'
     compile 'io.jsonwebtoken:jjwt:0.7.0'
     compile 'com.theartofdev.edmodo:android-image-cropper:2.3.+'
     compile 'de.hdodenhof:circleimageview:2.1.0'

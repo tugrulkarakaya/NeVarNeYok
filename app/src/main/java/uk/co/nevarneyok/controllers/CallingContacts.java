@@ -1,9 +1,6 @@
 package uk.co.nevarneyok.controllers;
 
-import android.content.Context;
-import android.widget.Toast;
 
-import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -14,40 +11,46 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
 import uk.co.nevarneyok.SettingsMy;
+import uk.co.nevarneyok.api.EndPoints;
 import uk.co.nevarneyok.entities.Contact;
 import uk.co.nevarneyok.entities.User;
 import uk.co.nevarneyok.utils.MsgUtils;
 
 /**
  * Created by mcagrikarakaya on 21.01.2017.
+ * Kişi Listesi ile ilgili işlemler bu sayfa ile yapılıyor.
  */
 
 public class CallingContacts {
-    User activeUser = SettingsMy.getActiveUser();
-    DatabaseReference myRef =  FirebaseDatabase.getInstance().getReference("contacts").child(activeUser.getUid()).child("callinggroups");
-    DatabaseReference getFirReference = FirebaseDatabase.getInstance().getReference("contacts").child(activeUser.getUid());
-    DatabaseReference pushRef;
-    Query myQueryRef;
+    private User activeUser = SettingsMy.getActiveUser();
+    private DatabaseReference myRef =  FirebaseDatabase.getInstance().getReference(EndPoints.FIREBASE_CONTACTS).child(activeUser.getUid()).child(EndPoints.FIREBASE_CALLING_GROUPS);
+    private DatabaseReference getFirReference = FirebaseDatabase.getInstance().getReference(EndPoints.FIREBASE_CONTACTS).child(activeUser.getUid());
+    private DatabaseReference pushRef;
+    private Query myQueryRef;
 
-    HashMap<String,Contact> Contacts = new HashMap<String, Contact>();
-    ArrayList<Contact> addContactList=new ArrayList<Contact>();
-    ArrayList<String> removeContactList = new ArrayList<String>();
+    private HashMap<String,Contact> Contacts = new HashMap<>();
+    private ArrayList<Contact> addContactList= new ArrayList<>();
+    private ArrayList<String> removeContactList = new ArrayList<>();
     public interface completion{
         void setResult(boolean result);
     }
-    public interface getContactsCompletion{
+    interface getContactsCompletion{
         void setResult(HashMap<String,Contact> ContactHashMap);
     }
-    public interface getUserCompletion{
+    interface getUserCompletion{
         void setResult(String key, User user);
+    }
+    public interface getFriendsCountsCompletion{
+        void setResult(boolean counts, Contact contact);
     }
 
     public void addCallingGroup(String groupName, String contactsKey, Contact contact){
         try {
             myRef.child(groupName).child(contactsKey).setValue(contact);
-            getFirReference.child("contacts").child(contactsKey).child("added").setValue(true);
+            getFirReference.child(EndPoints.FIREBASE_CONTACTS).child(contactsKey).child(EndPoints.FIREBASE_ADDED).setValue(true);
         }catch(Exception ex){
             MsgUtils.showToast("", MsgUtils.TOAST_TYPE_INTERNAL_ERROR, MsgUtils.ToastLength.LONG);
         }
@@ -57,11 +60,11 @@ public class CallingContacts {
     public void removeCallingGroup(final String groupName, final String contactsKey){
         try{
             myRef.child(groupName).child(contactsKey).removeValue();
-            getFirReference.child("contacts").child(contactsKey).addListenerForSingleValueEvent(new ValueEventListener() {
+            getFirReference.child(EndPoints.FIREBASE_CONTACTS).child(contactsKey).addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     if(dataSnapshot.exists()){
-                        getFirReference.child("contacts").child(contactsKey).child("added").setValue(false);
+                        getFirReference.child(EndPoints.FIREBASE_CONTACTS).child(contactsKey).child(EndPoints.FIREBASE_ADDED).setValue(false);
                     }
                 }
 
@@ -131,18 +134,18 @@ public class CallingContacts {
                     add=true;
                 }
                 for(Contact contact : addContactList){
-                    pushRef = getFirReference.child("contacts").push();
+                    pushRef = getFirReference.child(EndPoints.FIREBASE_CONTACTS).push();
                     pushRef.setValue(contact);
                 }
                 for (String key :
                         removeContactList) {
-                    getFirReference.child("contacts").child(key).removeValue();
+                    getFirReference.child(EndPoints.FIREBASE_CONTACTS).child(key).removeValue();
                 }
             }
         });
     }
-    public void getContacts(final getContactsCompletion getContactsCompletion){
-        getFirReference.child("contacts").addListenerForSingleValueEvent(new ValueEventListener() {
+    private void getContacts(final getContactsCompletion getContactsCompletion){
+        getFirReference.child(EndPoints.FIREBASE_CONTACTS).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for (DataSnapshot contactSnapshot : dataSnapshot.getChildren()) {
@@ -158,7 +161,7 @@ public class CallingContacts {
         });
     }
 
-    public void getUserExist(final getUserCompletion getUserCompletion){
+    private void getUserExist(final getUserCompletion getUserCompletion){
 
 
         myQueryRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -182,17 +185,46 @@ public class CallingContacts {
     }
 
     public void checkFriendsGroup(String phone, final String contactkey){
-        myQueryRef = FirebaseDatabase.getInstance().getReference().child("users").orderByChild("phone").equalTo(phone);
+        myQueryRef = FirebaseDatabase.getInstance().getReference().child(EndPoints.FIREBASE_USERS).orderByChild(EndPoints.FIREBASE_PHONE).equalTo(phone);
         getUserExist(new getUserCompletion() {
             @Override
             public void setResult(String key, User user) {
-                myRef.child("friends").child(contactkey).child("uid").setValue(key);
+                myRef.child(EndPoints.FIREBASE_FRIENDS).child(contactkey).child(EndPoints.FIREBASE_UID).setValue(key);
                 if (user.getProfileImageUrl() != null) {
-                    myRef.child("friends").child(contactkey).child("photoUrl").setValue(user.getProfileImageUrl());
+                    myRef.child(EndPoints.FIREBASE_FRIENDS).child(contactkey).child(EndPoints.FIREBASE_PHOTO_URL).setValue(user.getProfileImageUrl());
                 }
 
 
             }
         });
+    }
+    public void getFriendsCount(final getFriendsCountsCompletion getFriendsCountsCompletion){
+        FirebaseDatabase.getInstance().getReference().child(EndPoints.FIREBASE_CONTACTS)
+                .child(activeUser.getUid()).child(EndPoints.FIREBASE_CALLING_GROUPS)
+                .child(EndPoints.FIREBASE_FRIENDS)
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        Random rand = new Random();
+                        int n = rand.nextInt((int) dataSnapshot.getChildrenCount());
+                        Contact contact;
+                        ArrayList<Contact> contactList= new ArrayList<>();
+                        for (DataSnapshot contactsnapshot :
+                                dataSnapshot.getChildren()) {
+                                contactList.add(contactsnapshot.getValue(Contact.class));
+                        }
+                        contact=contactList.get(n);
+                        if(dataSnapshot.getChildrenCount()>10){
+                            getFriendsCountsCompletion.setResult(true, contact);
+                        }else{
+                            getFriendsCountsCompletion.setResult(false, null);
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
     }
 }

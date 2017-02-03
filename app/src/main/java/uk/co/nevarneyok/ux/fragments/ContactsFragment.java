@@ -97,7 +97,7 @@ public class ContactsFragment extends Fragment {
         myFirebaseRef=myRef.child("contacts");
         myQueryRef = myFirebaseRef.orderByChild("name");
         myQueryRef.keepSynced(true);
-        framelayout = (FrameLayout) view.findViewById(R.id.framelayout);
+        framelayout = (FrameLayout) view.findViewById(R.id.contactsframelayout);
 
         // Inflate the layout for this fragment
         return view;
