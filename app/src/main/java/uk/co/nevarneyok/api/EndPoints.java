@@ -50,5 +50,17 @@ public class EndPoints {
 
     public static final String SEND_NOTIFICATION                   = "https://fcm.googleapis.com/fcm/send";
 
+
+    //Firebase parameters
+    public static final String FIREBASE_CONTACTS        ="contacts";
+    public static final String FIREBASE_CALLING_GROUPS  ="callinggroups";
+    public static final String FIREBASE_USERS  ="users";
+    public static final String FIREBASE_PHONE  ="phone";
+    public static final String FIREBASE_FRIENDS  ="friends";
+    public static final String FIREBASE_UID  ="uid";
+    public static final String FIREBASE_PHOTO_URL  ="photoUrl";
+    public static final String FIREBASE_ADDED  ="added";
+    public static final String FIREBASE_NAME  ="name";
+
     private EndPoints() {}
 }

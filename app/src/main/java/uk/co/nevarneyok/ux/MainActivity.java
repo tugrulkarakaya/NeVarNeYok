@@ -88,6 +88,7 @@ import uk.co.nevarneyok.ux.dialogs.LoginExpiredDialogFragment;
 import uk.co.nevarneyok.ux.fragments.AccountEditFragment;
 import uk.co.nevarneyok.ux.fragments.AccountFragment;
 import uk.co.nevarneyok.ux.fragments.BannersFragment;
+import uk.co.nevarneyok.ux.fragments.CallBuddyFragment;
 import uk.co.nevarneyok.ux.fragments.CartFragment;
 import uk.co.nevarneyok.ux.fragments.CategoryFragment;
 import uk.co.nevarneyok.ux.fragments.ContactsFragment;
@@ -636,7 +637,8 @@ public class MainActivity extends AppCompatActivity implements DrawerFragment.Fr
             return true;
         }
         else if(id==R.id.menu_action_refresh){
-
+            replaceFragment(new CallBuddyFragment(),CallBuddyFragment.class.getSimpleName());
+            return true;
         }
 
         return super.onOptionsItemSelected(item);

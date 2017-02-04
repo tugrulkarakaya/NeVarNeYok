@@ -25,6 +25,7 @@ import com.squareup.picasso.Picasso;
 
 import uk.co.nevarneyok.R;
 import uk.co.nevarneyok.SettingsMy;
+import uk.co.nevarneyok.api.EndPoints;
 import uk.co.nevarneyok.controllers.CallingContacts;
 import uk.co.nevarneyok.entities.Contact;
 import uk.co.nevarneyok.entities.User;
@@ -63,13 +64,13 @@ public class FriendsGroupFragment extends Fragment {
 
         if(activeUser!=null){
             callingContacts = new CallingContacts();
-            myRef = FirebaseDatabase.getInstance().getReference("contacts").child(activeUser.getUid());
+            myRef = FirebaseDatabase.getInstance().getReference(EndPoints.FIREBASE_CONTACTS).child(activeUser.getUid());
         }
-        myFirebaseRef=myRef.child("callinggroups").child("friends");
-        myQueryRef = myFirebaseRef.orderByChild("name");
+        myFirebaseRef=myRef.child(EndPoints.FIREBASE_CALLING_GROUPS).child(EndPoints.FIREBASE_FRIENDS);
+        myQueryRef = myFirebaseRef.orderByChild(EndPoints.FIREBASE_NAME);
         myQueryRef.keepSynced(true);
 
-        framelayout = (FrameLayout) view.findViewById(R.id.framelayout);
+        framelayout = (FrameLayout) view.findViewById(R.id.friendgroupsframelayout);
 
         return view;
     }
