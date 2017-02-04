@@ -43,23 +43,20 @@ public class TokBoxJWTRequest extends JsonRequest {
     /**
      * Create a new authorized request.
      *
-     * @param jsonRequest     A {@link JSONObject} to post with the request. Null is allowed and
-     *                        indicates no parameters will be posted along with request.
      * @param successListener Listener to retrieve successful response
      * @param errorListener   Error listener, or null to ignore errors
      * @param fragmentManager Manager to create re-login dialog on HTTP status 403. Null is allowed.
-     * @param accessToken     Token identifying user used for user specific requests.
      */
-    public TokBoxJWTRequest( JSONObject jsonRequest, Response.Listener<JSONObject> successListener, Response.ErrorListener errorListener, FragmentManager fragmentManager, String accessToken) {
-        super(Method.POST, tokBoxUrl, jsonRequest, successListener, errorListener, fragmentManager, accessToken);
-        this.accessToken = accessToken;
+    public TokBoxJWTRequest( Response.Listener<JSONObject> successListener, Response.ErrorListener errorListener, FragmentManager fragmentManager) {
+        super(Method.POST, tokBoxUrl, null, successListener, errorListener, fragmentManager, getJWT());
+        this.accessToken = getJWT();
     }
 
     @Override
     public Map<String, String> getHeaders() throws AuthFailureError {
         Map<String, String> headers = new HashMap<>();
         headers.put("Client-Version", MyApplication.APP_VERSION);
-        //headers.put("Device-Token", MyApplication.ANDROID_ID);
+        headers.put("Device-Token", MyApplication.ANDROID_ID);
         //headers.put("X-OPENTOK-AUTH", payload); //This is old method. after july will be depreciated by opentok.
         headers.put("Accept", "application/json");
 

@@ -453,8 +453,7 @@ public class OpenTokVideoActivity extends AppCompatActivity implements Session.S
     private void sessionConnect() {
         if (mSession == null) {
             //Get new SessionID
-            AppSettingController appSettingController = new AppSettingController();
-            appSettingController.loadSettings( //Adam login olduğuna göre uygulama ayarlarını çekebiliriz.
+            AppSettingController.getAppSettingController().loadSettings( //Adam login olduğuna göre uygulama ayarlarını çekebiliriz.
                     new AppSettingController.AsyncResponse() {
                         @Override
                         public void processFinish(Boolean isFetched) {

@@ -31,6 +31,7 @@ import java.util.Locale;
 
 import okhttp3.OkHttpClient;
 import uk.co.nevarneyok.api.OkHttpStack;
+import uk.co.nevarneyok.controllers.AppSettingController;
 import uk.co.nevarneyok.testing.EspressoIdlingResource;
 import timber.log.Timber;
 
@@ -137,6 +138,13 @@ public class MyApplication extends Application {
             // should never happen
             Timber.e(e, "App versionName not found. WTF?. This should never happen.");
         }
+
+        AppSettingController.getAppSettingController().loadSettings(new AppSettingController.AsyncResponse() {
+            @Override
+            public void processFinish(Boolean isFetched) {
+                //do nothing.
+            }
+        });
     }
 
     /**

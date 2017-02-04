@@ -70,6 +70,7 @@ import uk.co.nevarneyok.api.EndPoints;
 import uk.co.nevarneyok.api.GsonRequest;
 import uk.co.nevarneyok.api.JsonRequest;
 import uk.co.nevarneyok.api.SoapRequest;
+import uk.co.nevarneyok.controllers.AppSettingController;
 import uk.co.nevarneyok.controllers.UserController;
 import uk.co.nevarneyok.entities.Banner;
 import uk.co.nevarneyok.entities.User;
@@ -244,6 +245,13 @@ public class MainActivity extends AppCompatActivity implements DrawerFragment.Fr
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
                 FirebaseUser user = firebaseAuth.getCurrentUser();
                 if (user != null) {
+                    AppSettingController.getAppSettingController().refreshSettings(new AppSettingController.AsyncResponse() {
+                        @Override
+                        public void processFinish(Boolean isFetched) {
+
+                        }
+                    });
+
                     final User loginUser = new User();
                     loginUser.setUid(user.getUid());
                     UserController userController = new UserController(loginUser);
