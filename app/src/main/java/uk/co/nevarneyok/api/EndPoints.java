@@ -47,5 +47,8 @@ public class EndPoints {
     public static final String NOTIFICATION_SHOP_ID     = "shop_id";
     public static final String NOTIFICATION_UTM         = "utm";
 
+
+    public static final String SEND_NOTIFICATION                   = "https://fcm.googleapis.com/fcm/send";
+
     private EndPoints() {}
 }
