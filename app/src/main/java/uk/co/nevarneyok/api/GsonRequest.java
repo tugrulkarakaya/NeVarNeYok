@@ -181,4 +181,7 @@ public class GsonRequest<T> extends Request<T> {
     public int getStatusCode() {
         return requestStatusCode;
     }
+    protected voidre setStatusCode(int requestStatusCode) {
+        this.requestStatusCode =  requestStatusCode;
+    }
 }

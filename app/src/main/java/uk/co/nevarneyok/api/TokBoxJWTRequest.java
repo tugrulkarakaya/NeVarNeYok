@@ -66,7 +66,7 @@ public class TokBoxJWTRequest extends GsonRequest<JSONObject> {
     @Override
     protected Response<JSONObject> parseNetworkResponse(NetworkResponse response) {
         try {
-            int requestStatusCode = response.statusCode;
+            setStatusCode(response.statusCode);
             if (BuildConfig.DEBUG) {
                 Timber.d("%s URL: %s. ResponseCode: %d", this.getClass().getSimpleName(), tokBoxUrl, response.statusCode);
                 JSONObject testSession = new JSONObject("{\"session_id\":\"1_MX40NTc1NzMzMn5-MTQ4NjI5MTE3MTY0OX5WU0xINUFQaXpCcFh4ZTRlbFUzOEs1Zzd-fg\",\"project_id\":\"45757332\",\"partner_id\":\"45757332\",\"create_dt\":\"Sun Feb 05 02:34:13 PST 2017\",\"media_server_url\":\"\"}");
