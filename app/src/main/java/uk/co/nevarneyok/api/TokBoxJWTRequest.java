@@ -1,14 +1,20 @@
 package uk.co.nevarneyok.api;
 
+import android.os.Build;
 import android.support.v4.app.FragmentManager;
 import android.util.Base64;
 
 import com.android.volley.AuthFailureError;
+import com.android.volley.NetworkResponse;
+import com.android.volley.ParseError;
 import com.android.volley.Request;
 import com.android.volley.Response;
+import com.android.volley.toolbox.HttpHeaderParser;
+import com.google.gson.JsonSyntaxException;
 
 import org.json.JSONObject;
 
+import java.io.UnsupportedEncodingException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SignatureException;
@@ -24,14 +30,19 @@ import javax.crypto.spec.SecretKeySpec;
 
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import timber.log.Timber;
+import uk.co.nevarneyok.BuildConfig;
 import uk.co.nevarneyok.MyApplication;
 import uk.co.nevarneyok.controllers.AppSettingController;
+import uk.co.nevarneyok.utils.Utils;
+
+import static android.icu.lang.UCharacter.GraphemeClusterBreak.T;
 
 /**
  * Created by mcagri on 27/01/2017.
  */
 
-public class TokBoxJWTRequest extends JsonRequest {
+public class TokBoxJWTRequest extends GsonRequest<JSONObject> {
     static String tokBoxApiKey = AppSettingController.getSetting("tokboxKey");
     static String tokBoxSecret = AppSettingController.getSetting("tokboxSecret");
     static String tokBoxUrl = AppSettingController.getSetting("tokboxUrl");
@@ -48,8 +59,32 @@ public class TokBoxJWTRequest extends JsonRequest {
      * @param fragmentManager Manager to create re-login dialog on HTTP status 403. Null is allowed.
      */
     public TokBoxJWTRequest( Response.Listener<JSONObject> successListener, Response.ErrorListener errorListener, FragmentManager fragmentManager) {
-        super(Method.POST, tokBoxUrl, null, successListener, errorListener, fragmentManager, getJWT());
+        super(Method.POST, tokBoxUrl, " ", JSONObject.class, successListener, errorListener, fragmentManager, getJWT());
         this.accessToken = getJWT();
+    }
+
+    @Override
+    protected Response<JSONObject> parseNetworkResponse(NetworkResponse response) {
+        try {
+            int requestStatusCode = response.statusCode;
+            if (BuildConfig.DEBUG) {
+                Timber.d("%s URL: %s. ResponseCode: %d", this.getClass().getSimpleName(), tokBoxUrl, response.statusCode);
+                JSONObject testSession = new JSONObject("{\"session_id\":\"1_MX40NTc1NzMzMn5-MTQ4NjI5MTE3MTY0OX5WU0xINUFQaXpCcFh4ZTRlbFUzOEs1Zzd-fg\",\"project_id\":\"45757332\",\"partner_id\":\"45757332\",\"create_dt\":\"Sun Feb 05 02:34:13 PST 2017\",\"media_server_url\":\"\"}");
+                return Response.success(testSession,HttpHeaderParser.parseCacheHeaders(response));
+            }
+            // Parse response and return obtained object
+            String json = new String(response.data, "utf-8").replace('[',' ').replace(']',' ').trim();
+            JSONObject result = new JSONObject(json);
+            //JSONObject result = Utils.getGsonParser().fromJson(json, JSONObject.class);
+            if (result == null) return Response.error(new ParseError(new NullPointerException()));
+            else return Response.success(result, HttpHeaderParser.parseCacheHeaders(response));
+        } catch (UnsupportedEncodingException e) {
+            return Response.error(new ParseError(e));
+        } catch (JsonSyntaxException e) {
+            return Response.error(new ParseError(e));
+        } catch (Exception e) {
+            return Response.error(new ParseError(e));
+        }
     }
 
     @Override
@@ -57,8 +92,10 @@ public class TokBoxJWTRequest extends JsonRequest {
         Map<String, String> headers = new HashMap<>();
         headers.put("Client-Version", MyApplication.APP_VERSION);
         headers.put("Device-Token", MyApplication.ANDROID_ID);
-        //headers.put("X-OPENTOK-AUTH", payload); //This is old method. after july will be depreciated by opentok.
         headers.put("Accept", "application/json");
+        //connection.setRequestProperty("X-TB-PARTNER-AUTH", "KEYID:SECRETKEY"); //This is old method. after july will be depreciated by opentok.
+
+
 
         // Determine if request should be authorized.
         if (accessToken != null && !accessToken.isEmpty()) {
@@ -95,6 +132,9 @@ public class TokBoxJWTRequest extends JsonRequest {
         String hash = calculateRFC2104HMAC(dataString, tokBoxSecret);
         String preCoded = "partner_id="+tokBoxApiKey+"&sig="+hash+":"+dataString;
         token = "T1=="+ Base64.encodeToString(preCoded.getBytes(),0);
+        if(BuildConfig.DEBUG){
+            return "T1==cGFydG5lcl9pZD00NTc1NzMzMiZzaWc9MWNiMDljYzdiYmYxNWRiZThjZmVlNzExY2IxODc5MjNkZWE3ZTY0MTpzZXNzaW9uX2lkPTFfTVg0ME5UYzFOek16TW41LU1UUTROakk1TVRFM01UWTBPWDVXVTB4SU5VRlFhWHBDY0ZoNFpUUmxiRlV6T0VzMVp6ZC1mZyZjcmVhdGVfdGltZT0xNDg2MjkxMzc3Jm5vbmNlPTAuMzQyNDIwNDIxODk2NjQ3NTYmcm9sZT1wdWJsaXNoZXImZXhwaXJlX3RpbWU9MTQ4ODg4MzM3Ng==";
+        }
         return token;
     }
 
@@ -114,3 +154,38 @@ public class TokBoxJWTRequest extends JsonRequest {
         return formatter.toString();
     }
 }
+
+/*
+final TokBoxJWTRequest tokBoxJWTRequest = new TokBoxJWTRequest(new Response.Listener<JSONObject>() {
+                            @Override
+                            public void onResponse(JSONObject response) {
+                                try {
+                                    String sessionId = response.getString("session_id");
+                                    String token =  TokBoxJWTRequest.CreateToken(sessionId,"Publisher","",60);
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                } catch (NoSuchAlgorithmException e) {
+                                    e.printStackTrace();
+                                } catch (SignatureException e) {
+                                    e.printStackTrace();
+                                } catch (InvalidKeyException e) {
+                                    e.printStackTrace();
+                                }
+
+                            }
+                        }, new Response.ErrorListener() {
+                            @Override
+                            public void onErrorResponse(VolleyError error) {
+
+                            }
+                        }, getFragmentManager());
+
+                        tokBoxJWTRequest.setRetryPolicy(MyApplication.getDefaultRetryPolice());
+                        tokBoxJWTRequest.setShouldCache(false);
+                        new Handler().postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                MyApplication.getInstance().addToRequestQueue(tokBoxJWTRequest, CONST.NOTIFICATION_SEND_TAG);
+                            }
+                        }, 75);
+ */
