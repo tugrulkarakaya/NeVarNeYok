@@ -119,6 +119,8 @@ public class FIRNotificaiton {
         private String imageUrl;
         @JsonProperty("htmlId")
         private String htmlId;
+        @JsonProperty("sessionId")
+        private String sessionId;
 
         /**
          * No args constructor for use in serialization
@@ -127,19 +129,21 @@ public class FIRNotificaiton {
         }
 
         /**
+         * @param link
          * @param message
          * @param title
          * @param imageUrl
-         * @param link
          * @param htmlId
+         * @param sessionId
          */
-        public Data(String link, String message, String title, String imageUrl, String htmlId) {
+        public Data(String link, String message, String title, String imageUrl, String htmlId, String sessionId) {
             super();
             this.link = link;
             this.message = message;
             this.title = title;
             this.imageUrl = imageUrl;
             this.htmlId = htmlId;
+            this.sessionId = sessionId;
         }
 
         @JsonProperty("link")
@@ -222,6 +226,13 @@ public class FIRNotificaiton {
             return ToStringBuilder.reflectionToString(this);
         }
 
+        public String getSessionId() {
+            return sessionId;
+        }
+
+        public void setSessionId(String sessionId) {
+            this.sessionId = sessionId;
+        }
     }
 }
 

@@ -34,6 +34,7 @@ public class CONST {
     public static final String ORDERS_DETAIL_REQUESTS_TAG = "orders_detail_requests";
 
     public static final String NOTIFICATION_SEND_TAG = "send_notificaiton_requests";
+    public static final String TOKBOX_SESSION_GENERATION = "toxbox_session_generation";
     // Bundle constants
     public static final String BUNDLE_PASS_TARGET = "target";
     public static final String BUNDLE_PASS_TITLE = "title";

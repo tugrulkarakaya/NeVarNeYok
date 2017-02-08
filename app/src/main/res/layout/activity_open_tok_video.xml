@@ -26,7 +26,7 @@
             android:layout_height="fill_parent"
             android:visibility="gone" >
 
-            <uk.co.healthod.mhealth.ui.AudioLevelView
+            <uk.co.nevarneyok.ux.AudioLevelView
                 android:id="@+id/subscribermeter"
                 android:layout_width="fill_parent"
                 android:layout_height="fill_parent"

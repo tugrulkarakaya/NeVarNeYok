@@ -148,6 +148,9 @@ public class ContactsFragment extends Fragment {
     public void onStart() {
         super.onStart();
         if(activeUser!=null) {
+            DatabaseReference IIDToken = FirebaseDatabase.getInstance().getReference();
+            String refreshedToken = FirebaseInstanceId.getInstance().getToken();
+            IIDToken.child("IIDToken").child(activeUser.getUid()).setValue(refreshedToken);
             FirebaseRecyclerAdapter<Contact, ContactListHolder> firebaseRecyclerAdapter = new FirebaseRecyclerAdapter<Contact, ContactListHolder>(
                     Contact.class,
                     R.layout.contacts_list_row,

@@ -58,7 +58,8 @@
                 android:name="android.app.searchable"
                 android:resource="@xml/searchable"/>
         </activity>
-
+        <activity android:name=".ux.OpenTokVideoActivity"
+            android:screenOrientation="sensorPortrait"/>
         <activity
             android:name=".ux.RestartAppActivity"
             android:screenOrientation="portrait"/>

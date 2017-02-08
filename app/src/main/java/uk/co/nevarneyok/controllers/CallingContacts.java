@@ -206,15 +206,19 @@ public class CallingContacts {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         Random rand = new Random();
-                        int n = rand.nextInt((int) dataSnapshot.getChildrenCount());
+
                         Contact contact;
                         ArrayList<Contact> contactList= new ArrayList<>();
                         for (DataSnapshot contactsnapshot :
                                 dataSnapshot.getChildren()) {
+                            if(contactsnapshot.getValue(Contact.class).getUid()!=null){
                                 contactList.add(contactsnapshot.getValue(Contact.class));
+                            }
                         }
-                        contact=contactList.get(n);
-                        if(dataSnapshot.getChildrenCount()>10){
+
+                        if(contactList.size()>=2){
+                            int n = rand.nextInt(contactList.size());
+                            contact=contactList.get(n);
                             getFriendsCountsCompletion.setResult(true, contact);
                         }else{
                             getFriendsCountsCompletion.setResult(false, null);

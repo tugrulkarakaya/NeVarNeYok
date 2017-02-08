@@ -18,61 +18,87 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import uk.co.nevarneyok.BuildConfig;
 import uk.co.nevarneyok.R;
+import uk.co.nevarneyok.api.EndPoints;
+import uk.co.nevarneyok.ux.MainActivity;
 import uk.co.nevarneyok.ux.OpenTokVideoActivity;
 
 /**
  * Created by mcagrikarakaya on 29.01.2017.
+ * Bildirim geldiğinde telefonda nasıl gözükeceğine dair işlemleri burada yapıyoruz.
  */
 
 public class MyFirebaseMessagingService extends FirebaseMessagingService {
+    private static final int NOTIFICATION_ID = 6342806;
+
     private static final String TAG = "MyFirebaseMsgService";
 
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
-        if (remoteMessage.getData().size() > 0) { // Data mesajı içeriyor mu
-            //Uygulama arkaplanda veya ön planda olması farketmez. Her zaman çağırılacaktır.
-            //Gelen içerik json formatındadır.
-            Log.d(TAG, "Mesaj data içeriği: " + remoteMessage.getData());
+        Log.d(TAG, "Mesaj data içeriği: " + remoteMessage.getData());
 
-            //Json formatındaki datayı parse edip kullanabiliriz. Biz direk datayı Push Notification olarak bastırıyoruz
 
-            sendNotification(remoteMessage.getData().get("tittle"),""+remoteMessage.getData().get("message"));
+        sendNotification(remoteMessage);
+    }
+    private void sendNotification(RemoteMessage remoteMessage) {
+        String Sessionid=remoteMessage.getData().get(EndPoints.NOTIFICATION_SESSION_ID);
+        if (Sessionid != null) {
+            //Arama geldiğinde yapılacak servis uyandırma işlemleri burada yapılacak
+        }
+        else{
+            NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
+                    .setSmallIcon(R.mipmap.ic_launcher)
+                    .setLargeIcon(BitmapFactory.decodeResource(getResources(),R.mipmap.ic_launcher))
+                    .setContentTitle(remoteMessage.getData().get(EndPoints.NOTIFICATION_TITLE))
+                    .setStyle(new NotificationCompat.BigTextStyle().bigText(remoteMessage.getData().get(EndPoints.NOTIFICATION_MESSAGE)))
+                    .setContentText(remoteMessage.getData().get(EndPoints.NOTIFICATION_MESSAGE))
+                    .setAutoCancel(true)
+                    .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION));
+            String imageUrl = remoteMessage.getData().get(EndPoints.NOTIFICATION_IMAGE_URL);
+            if (imageUrl != null && !imageUrl.isEmpty()) {
+                Bitmap bitmap = getBitmapFromURL(imageUrl);
+                if (bitmap != null) {
+                    if (BuildConfig.DEBUG) Log.d(TAG, "Set big icon");
+                    notificationBuilder.setStyle(new NotificationCompat.BigPictureStyle()
+                            .bigPicture(bitmap)
+                            .setBigContentTitle(remoteMessage.getData().get(EndPoints.NOTIFICATION_TITLE))
+                            .setSummaryText(remoteMessage.getData().get(EndPoints.NOTIFICATION_MESSAGE)));
+                } else {
+                    if (BuildConfig.DEBUG) Log.e(TAG, "Cannot download image");
+                }
+            }
+            String link = remoteMessage.getData().get(EndPoints.NOTIFICATION_LINK);
 
+            if (BuildConfig.DEBUG) Log.d(TAG, "Fcm linkType: " + link);
+            Intent notificationIntent;
+            if (link != null && link.contains("http")) {
+                Uri url;
+                try {
+                    url = Uri.parse(link);
+                } catch (Exception e) {
+                    if (BuildConfig.DEBUG) Log.e(TAG, "Parsing notification url failed.");
+                    return;
+                }
+                notificationIntent = new Intent(Intent.ACTION_VIEW, url);
+            } else {
+                notificationIntent = new Intent(this, MainActivity.class);
+                notificationIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                notificationIntent.putExtra(EndPoints.NOTIFICATION_LINK, link);
+                notificationIntent.putExtra(EndPoints.NOTIFICATION_TITLE, remoteMessage.getData().get(EndPoints.NOTIFICATION_TITLE));
+            }
+
+            PendingIntent contentIntent = PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+            notificationBuilder.setContentIntent(contentIntent);
+            ((NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE)).notify(NOTIFICATION_ID, notificationBuilder.build());
         }
 
-        if (remoteMessage.getNotification() != null) { //Notification mesajı içeriyor mu
-            //Uygulama arkaplanda ise burası çağrılmaz.Ön planda ise notification mesajı geldiğinde çağırılır
-            //getBody() ile mesaj içeriği
-            //getTitle() ile mesaj başlığı
-            Log.d(TAG, "Mesaj Notification Başlığı: " + remoteMessage.getNotification().getTitle() +" "+"Mesaj Notification İçeriği: " + remoteMessage.getNotification().getBody() );
 
-            //Gelen içeriğe göre notifikasyon bildiriminde bulunma
-            sendNotification(remoteMessage.getNotification().getTitle(),remoteMessage.getNotification().getBody());
-        }
-    }
-    private void sendNotification(String messageTitle,String messageBody) {
-        Intent intent = new Intent(this, OpenTokVideoActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent,
-                PendingIntent.FLAG_ONE_SHOT);
 
-        Uri defaultSoundUri= RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
-                .setSmallIcon(R.mipmap.ic_launcher)
-                .setContentTitle(messageTitle)
-                .setContentText(messageBody)
-                .setAutoCancel(true)
-                .setSound(defaultSoundUri)
-                .setContentIntent(pendingIntent);
-
-        NotificationManager notificationManager =
-                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-
-        notificationManager.notify(0 /* ID of notification */, notificationBuilder.build());
 
 
     }
+
     private Bitmap getBitmapFromURL(String stringURL) {
         try {
             URL url = new URL(stringURL);

@@ -105,6 +105,9 @@ import uk.co.nevarneyok.ux.fragments.WishlistFragment;
 import timber.log.Timber;
 
 import io.fabric.sdk.android.*;
+
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.twitter.sdk.android.core.*;
 import com.digits.sdk.android.*;
 import com.twitter.sdk.android.core.internal.TwitterApi;
@@ -216,12 +219,12 @@ public class MainActivity extends AppCompatActivity implements DrawerFragment.Fr
     }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         mInstance = this;
         mAuth = FirebaseAuth.getInstance();
         mMyApplication = (MyApplication) this.getApplicationContext();
         mMyApplication.setCurrentActivity(this);
-
 
         Timber.d("%s onCreate", MainActivity.class.getSimpleName());
 
