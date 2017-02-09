@@ -45,6 +45,9 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
         String Sessionid=remoteMessage.getData().get(EndPoints.NOTIFICATION_SESSION_ID);
         if (Sessionid != null) {
             //Arama geldiğinde yapılacak servis uyandırma işlemleri burada yapılacak
+            Intent intent = new Intent(getApplicationContext(),IsCallComingService.class);
+            intent.putExtra("Sessionid",Sessionid);
+            startService(intent);
         }
         else{
             NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)

@@ -43,13 +43,6 @@
       <sourceFolder url="file://$MODULE_DIR$/src/LegacyDebug/java" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/LegacyDebug/rs" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/src/LegacyDebug/shaders" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/src/testLegacyDebug/res" type="java-test-resource" />
-      <sourceFolder url="file://$MODULE_DIR$/src/testLegacyDebug/resources" type="java-test-resource" />
-      <sourceFolder url="file://$MODULE_DIR$/src/testLegacyDebug/assets" type="java-test-resource" />
-      <sourceFolder url="file://$MODULE_DIR$/src/testLegacyDebug/aidl" isTestSource="true" />
-      <sourceFolder url="file://$MODULE_DIR$/src/testLegacyDebug/java" isTestSource="true" />
-      <sourceFolder url="file://$MODULE_DIR$/src/testLegacyDebug/rs" isTestSource="true" />
-      <sourceFolder url="file://$MODULE_DIR$/src/testLegacyDebug/shaders" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/build/generated/source/r/androidTest/Legacy/debug" isTestSource="true" generated="true" />
       <sourceFolder url="file://$MODULE_DIR$/build/generated/source/aidl/androidTest/Legacy/debug" isTestSource="true" generated="true" />
       <sourceFolder url="file://$MODULE_DIR$/build/generated/source/buildConfig/androidTest/Legacy/debug" isTestSource="true" generated="true" />
@@ -57,6 +50,13 @@
       <sourceFolder url="file://$MODULE_DIR$/build/generated/source/apt/androidTest/Legacy/debug" isTestSource="true" generated="true" />
       <sourceFolder url="file://$MODULE_DIR$/build/generated/res/rs/androidTest/Legacy/debug" type="java-test-resource" />
       <sourceFolder url="file://$MODULE_DIR$/build/generated/res/resValues/androidTest/Legacy/debug" type="java-test-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/src/testLegacyDebug/res" type="java-test-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/src/testLegacyDebug/resources" type="java-test-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/src/testLegacyDebug/assets" type="java-test-resource" />
+      <sourceFolder url="file://$MODULE_DIR$/src/testLegacyDebug/aidl" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/src/testLegacyDebug/java" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/src/testLegacyDebug/rs" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/src/testLegacyDebug/shaders" isTestSource="true" />
       <sourceFolder url="file://$MODULE_DIR$/src/Legacy/res" type="java-resource" />
       <sourceFolder url="file://$MODULE_DIR$/src/Legacy/resources" type="java-resource" />
       <sourceFolder url="file://$MODULE_DIR$/src/Legacy/assets" type="java-resource" />
@@ -141,11 +141,12 @@
     </content>
     <orderEntry type="jdk" jdkName="Android API 25 Platform" jdkType="Android SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" exported="" name="constraint-layout-1.0.0-beta4" level="project" />
     <orderEntry type="library" exported="" name="okio-1.6.0" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="runner-0.5" level="project" />
     <orderEntry type="library" exported="" name="firebase-ui-database-1.0.0" level="project" />
-    <orderEntry type="library" exported="" scope="TEST" name="javassist-3.20.0-GA" level="project" />
     <orderEntry type="library" exported="" name="espresso-idling-resource-2.2.2" level="project" />
+    <orderEntry type="library" exported="" scope="TEST" name="javassist-3.20.0-GA" level="project" />
     <orderEntry type="library" exported="" name="firebase-core-10.0.1" level="project" />
     <orderEntry type="library" exported="" name="play-services-tagmanager-v4-impl-10.0.1" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="hamcrest-library-1.3" level="project" />
@@ -194,6 +195,7 @@
     <orderEntry type="library" exported="" name="firebase-auth-10.0.1" level="project" />
     <orderEntry type="library" exported="" name="play-services-tasks-10.0.1" level="project" />
     <orderEntry type="library" exported="" scope="TEST" name="hamcrest-integration-1.3" level="project" />
+    <orderEntry type="library" exported="" name="constraint-layout-solver-1.0.0-beta4" level="project" />
     <orderEntry type="library" exported="" name="ksoap2-android-3.6.2" level="project" />
     <orderEntry type="library" exported="" name="play-services-base-10.0.1" level="project" />
     <orderEntry type="library" exported="" name="okhttp-urlconnection-3.2.0" level="project" />

@@ -54,13 +54,15 @@ public class CallBuddyFragment extends Fragment {
     CallingContacts callingContacts;
     private static FrameLayout framelayout;
 
-    private String connectionKey;
+    private String OpponentConnectionKey;
     private String MyConnectionKey;
 
     private DatabaseReference refMyUser;
     private DatabaseReference refOpponentUserCon;
     private DatabaseReference refCallAnswer;
     private DatabaseReference refGetOpponentIID;
+    private String SessionId;
+    private String TOKEN;
 
     private FirebaseDatabase myFirebaseDatabase=FirebaseDatabase.getInstance();
     private FirebaseDatabase myOpFirebaseDatabase=FirebaseDatabase.getInstance();
@@ -68,17 +70,13 @@ public class CallBuddyFragment extends Fragment {
     User activeUser = SettingsMy.getActiveUser();
     Contact Callcontact;
 
-
-    String accessToken = "AAAABmit7S4:APA91bEQvRmLoo_q_yvvyqdsn3nbSwUTpwEk0f8h-PSH3hLLDP5ZOFw5prZ1QLlGSXjHLxGDMkhl0KDT4Tcp6XXXMdof9h8B0R55ATSiWADEjASetuQjn_a4RuKlrY8pCLAUj19wrRxB";
-
-
     final TokBoxJWTRequest tokBoxJWTRequest = new TokBoxJWTRequest(new Response.Listener<JSONObject>() {
         @Override
         public void onResponse(JSONObject response) {
             try {
 
-                final String sessionId = response.getString("session_id");
-                String token =  TokBoxJWTRequest.CreateToken(sessionId,"Publisher","",60);
+                SessionId = response.getString("session_id");
+                TOKEN =  TokBoxJWTRequest.CreateToken(SessionId,"Publisher","",60);
 
                 refMyUser=myFirebaseDatabase.getReference().child("connections").child(activeUser.getUid());
                 refMyUser.limitToLast(1).addListenerForSingleValueEvent(new ValueEventListener() {
@@ -116,7 +114,7 @@ public class CallBuddyFragment extends Fragment {
                                 firNotificaiton.setRegistrationIds(Collections.singletonList("dwcUDLQ-beM:APA91bHzbUwMSmnwfZi-NGIz13nz1alor-" +
                                         "FlGkr0IBrUD6DFgfy26hdZ-XoOMDU-tXC81_bgHlfMqieBCGnoPI6KdTmcxFSp5sAQIgFXIlu8SLWrdQDF4c-f3GrQhSi8p_tNhdnmZ4V1"));
                                 FIRNotificaiton.Data data = firNotificaiton.getData();
-                                data.setSessionId(sessionId);
+                                data.setSessionId(SessionId);
                                 String accessToken = "AAAAI19nIgY:APA91bG80k7rLZ2s-u3rdmmFLGg6nJg0NTlPfAN_" +
                                         "OzjCGDG1BP4LpslryQSaOb_zmdkH5iWr13zHpvUGRVwMLBYX4LIVTsngZvmtiAqtVueQK_lTBnWOq8BYBL5gasGrJK59i7ynl32W";
                                 try {
@@ -265,19 +263,21 @@ public class CallBuddyFragment extends Fragment {
     public void opponentUserSetConnection(String oppenent_id){
         CallConnection con=new CallConnection(2,activeUser.getUid(),0);
         DatabaseReference newCallRef = refOpponentUserCon.child("connections").child(oppenent_id).push();
-        connectionKey=newCallRef.getKey();
+        OpponentConnectionKey=newCallRef.getKey();
         newCallRef.setValue(con);
 
         refCallAnswer = newCallRef.child("callanswer");
         refCallAnswer.onDisconnect().setValue(201);
         startIntent(oppenent_id);
     }
-    public void startIntent(String userId){
+    public void startIntent(String OpponentId){
         Intent intent=new Intent(getContext(),OpenTokVideoActivity.class);
         intent.putExtra("user_id", activeUser.getUid());
-        intent.putExtra("oppenent_id",userId);
-        intent.putExtra("connectionKey",connectionKey);
+        intent.putExtra("OpponentId",OpponentId);
+        intent.putExtra("OpponentConnectionKey",OpponentConnectionKey);
         intent.putExtra("MyConnectionKey",MyConnectionKey);
+        intent.putExtra("SessionId",SessionId);
+        intent.putExtra("TOKEN",TOKEN);
         startActivity(intent);
 
     }

@@ -26,8 +26,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.opentok.android.BaseVideoRenderer;
 import com.opentok.android.OpentokError;
 import com.opentok.android.Publisher;
@@ -99,9 +102,11 @@ public class OpenTokVideoActivity extends AppCompatActivity implements Session.S
     private FirebaseDatabase firebaseDatabase= FirebaseDatabase.getInstance();
     private DatabaseReference myFirebaseRef;
     String uid;
-    String id;
-//    String connectionKey;
-//    String MyConnectionKey;
+    String OpponentId;
+    String OpponentConnectionKey;
+    String MyConnectionKey;
+    String TOKEN;
+    String SessionId;
 
 
     @Override
@@ -111,10 +116,12 @@ public class OpenTokVideoActivity extends AppCompatActivity implements Session.S
         // Remove title bar
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         myFirebaseRef=firebaseDatabase.getReference();
-//        uid = getIntent().getExtras().getString("user_id");
-//        id=getIntent().getExtras().getString("id");
-//        connectionKey=getIntent().getExtras().getString("connectionKey");
-//        MyConnectionKey=getIntent().getExtras().getString("MyConnectionKey");
+        uid = getIntent().getExtras().getString("user_id");
+        OpponentId=getIntent().getExtras().getString("OpponentId");
+        OpponentConnectionKey=getIntent().getExtras().getString("OpponentConnectionKey");
+        MyConnectionKey=getIntent().getExtras().getString("MyConnectionKey");
+        TOKEN=getIntent().getExtras().getString("TOKEN");
+        SessionId=getIntent().getExtras().getString("SessionId");
         mAuth = FirebaseAuth.getInstance();
         loadInterface();
 
@@ -130,26 +137,26 @@ public class OpenTokVideoActivity extends AppCompatActivity implements Session.S
 
         mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
-        sessionConnect();
-//            myFirebaseRef.child("users").child(uid).child("connections").child(MyConnectionKey).child("callanswer").addValueEventListener(new ValueEventListener() {
-//                @Override
-//                public void onDataChange(DataSnapshot dataSnapshot) {
-//                    if ((long)dataSnapshot.getValue()>100){
-//                        onEndCall();
-//                    }
-//                }
-//
-//                @Override
-//                public void onCancelled(DatabaseError databaseError) {
-//
-//                }
-//            });
+        sessionConnectWithId(SessionId);
+        myFirebaseRef.child("connections").child(uid).child(MyConnectionKey).child("callanswer").addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    if ((long)dataSnapshot.getValue()>100){
+                        onEndCall();
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
 
     }
     public void reddet(){
 
-//        myFirebaseRef.child("users").child(uid).child("connections").child(MyConnectionKey).child("callanswer").setValue(103);
-//        myFirebaseRef.child("users").child(id).child("connections").child(connectionKey).child("callanswer").setValue(103);
+        myFirebaseRef.child("connections").child(uid).child(MyConnectionKey).child("callanswer").setValue(103);
+        myFirebaseRef.child("connections").child(OpponentId).child(OpponentConnectionKey).child("callanswer").setValue(103);
         finish();
     }
     @Override
@@ -450,43 +457,13 @@ public class OpenTokVideoActivity extends AppCompatActivity implements Session.S
         loadFragments();
     }
 
-    private void sessionConnect() {
-        if (mSession == null) {
-            //Get new SessionID
-            AppSettingController.getAppSettingController().loadSettings( //Adam login olduğuna göre uygulama ayarlarını çekebiliriz.
-                    new AppSettingController.AsyncResponse() {
-                        @Override
-                        public void processFinish(Boolean isFetched) {
-                            final OpenTokRestApiController openTokController = new OpenTokRestApiController(new OpenTokRestApiController.AsyncResponse() {
-                                @Override
-                                public void processFinish(String sessionId) {
-                                    try {
-                                        sessionConnectWithId(sessionId);
-                                    } catch (NoSuchAlgorithmException e) {
-                                        e.printStackTrace();
-                                    } catch (SignatureException e) {
-                                        e.printStackTrace();
-                                    } catch (InvalidKeyException e) {
-                                        e.printStackTrace();
-                                    }
-                                }
-                            });
-                            openTokController.execute();
-                        }
-                    }
-            );
 
-
-        }
-    }
-
-    private final void sessionConnectWithId(String sessionId) throws NoSuchAlgorithmException, SignatureException, InvalidKeyException {
+    private final void sessionConnectWithId(String sessionId){
         mSession = new Session(this, AppSettingController.getSetting("tokboxKey"), sessionId);
         mSession.setSessionListener(this);
         mSession.setArchiveListener(this);
         mSession.setStreamPropertiesListener(this);
-        String token =  OpenTokRestApiController.CreateToken(sessionId,"Publisher","",30);
-        mSession.connect(token);
+        mSession.connect(TOKEN);
     }
 
     private void attachPublisherView(Publisher publisher) {

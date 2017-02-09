@@ -133,7 +133,7 @@ public class TokBoxJWTRequest extends GsonRequest<JSONObject> {
         String preCoded = "partner_id="+tokBoxApiKey+"&sig="+hash+":"+dataString;
         token = "T1=="+ Base64.encodeToString(preCoded.getBytes(),0);
         if(BuildConfig.DEBUG){
-            return "T1==cGFydG5lcl9pZD00NTc1NzMzMiZzaWc9MWNiMDljYzdiYmYxNWRiZThjZmVlNzExY2IxODc5MjNkZWE3ZTY0MTpzZXNzaW9uX2lkPTFfTVg0ME5UYzFOek16TW41LU1UUTROakk1TVRFM01UWTBPWDVXVTB4SU5VRlFhWHBDY0ZoNFpUUmxiRlV6T0VzMVp6ZC1mZyZjcmVhdGVfdGltZT0xNDg2MjkxMzc3Jm5vbmNlPTAuMzQyNDIwNDIxODk2NjQ3NTYmcm9sZT1wdWJsaXNoZXImZXhwaXJlX3RpbWU9MTQ4ODg4MzM3Ng==";
+            //return "T1==cGFydG5lcl9pZD00NTc1NzMzMiZzaWc9MWNiMDljYzdiYmYxNWRiZThjZmVlNzExY2IxODc5MjNkZWE3ZTY0MTpzZXNzaW9uX2lkPTFfTVg0ME5UYzFOek16TW41LU1UUTROakk1TVRFM01UWTBPWDVXVTB4SU5VRlFhWHBDY0ZoNFpUUmxiRlV6T0VzMVp6ZC1mZyZjcmVhdGVfdGltZT0xNDg2MjkxMzc3Jm5vbmNlPTAuMzQyNDIwNDIxODk2NjQ3NTYmcm9sZT1wdWJsaXNoZXImZXhwaXJlX3RpbWU9MTQ4ODg4MzM3Ng==";
         }
         return token;
     }
