@@ -32,6 +32,7 @@ import java.util.Arrays;
 import java.util.Collections;
 
 import timber.log.Timber;
+import uk.co.nevarneyok.BuildConfig;
 import uk.co.nevarneyok.CONST;
 import uk.co.nevarneyok.MyApplication;
 import uk.co.nevarneyok.R;
@@ -195,6 +196,7 @@ public class CallBuddyFragment extends Fragment {
                     @Override
                     public void setResult(boolean counts, Contact contact) {
                         Callcontact=contact;
+                        Callcontact.setUid("1LGK7xEM0kPyACfkFaCZTFjShvt2");
                         if (counts){
                             tokBoxJWTRequest.setRetryPolicy(MyApplication.getDefaultRetryPolice());
                             tokBoxJWTRequest.setShouldCache(false);
@@ -277,6 +279,13 @@ public class CallBuddyFragment extends Fragment {
         intent.putExtra("OpponentConnectionKey",OpponentConnectionKey);
         intent.putExtra("MyConnectionKey",MyConnectionKey);
         intent.putExtra("SessionId",SessionId);
+        if(BuildConfig.DEBUG){
+            TOKEN = "T1==cGFydG5lcl9pZD00NTc1NzMzMiZzaWc9MjBjZTk5MDg1N2Y4YzViNmE0YzA5ZjJiYWU5ZmMy" +
+                    "ZGU3ODQ3OTcyMzpzZXNzaW9uX2lkPTFfTVg0ME5UYzFOek16TW41LU1UUTROakk1TVRFM01UWTBP" +
+                    "WDVXVTB4SU5VRlFhWHBDY0ZoNFpUUmxiRlV6T0VzMVp6ZC1mZyZjcmVhdGVfdGltZT0xNDg2NzM2" +
+                    "ODg3Jm5vbmNlPTAuMjk3OTU0ODU0ODU1NTIyODcmcm9sZT1wdWJsaXNoZXImZXhwaXJlX3RpbWU9" +
+                    "MTQ4OTMyODkxMw==";
+        }
         intent.putExtra("TOKEN",TOKEN);
         startActivity(intent);
 

@@ -15,6 +15,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import uk.co.nevarneyok.BuildConfig;
 import uk.co.nevarneyok.R;
 import uk.co.nevarneyok.SettingsMy;
 import uk.co.nevarneyok.controllers.BeepRunnable;
@@ -31,6 +32,7 @@ public class IncomingCallActivity extends AppCompatActivity {
 
     private FirebaseDatabase firebaseDatabase=FirebaseDatabase.getInstance();
     private DatabaseReference myFirebaseRef;
+    String TOKEN;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,7 +50,7 @@ public class IncomingCallActivity extends AppCompatActivity {
         final String MyConnectionKey=getIntent().getExtras().getString("MyConnectionKey");
         final String OpponentId=getIntent().getExtras().getString("OpponentId");
         final String SessionId=getIntent().getExtras().getString("Sessionid");
-        final String TOKEN=getIntent().getExtras().getString("TOKEN");
+        TOKEN=getIntent().getExtras().getString("TOKEN");
         myFirebaseRef.child("connections").child(activeUser.getUid()).child(MyConnectionKey).child("callanswer").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -76,6 +78,12 @@ public class IncomingCallActivity extends AppCompatActivity {
                 intent.putExtra("MyConnectionKey",MyConnectionKey);
                 intent.putExtra("OpponentConnectionKey",OpponentConnectionKey);
                 intent.putExtra("SessionId",SessionId);
+                if(BuildConfig.DEBUG){
+                    TOKEN="T1==cGFydG5lcl9pZD00NTc1NzMzMiZzaWc9NDYzMDY0NTdhM2ZkOWM0Yjk1OGViOWU3MmI5NTI0Mz" +
+                            "BiYTE4OGJmMjpzZXNzaW9uX2lkPTFfTVg0ME5UYzFOek16TW41LU1UUTROakk1TVRFM01UWTBPWD" +
+                            "VXVTB4SU5VRlFhWHBDY0ZoNFpUUmxiRlV6T0VzMVp6ZC1mZyZjcmVhdGVfdGltZT0xNDg2NzM2Nz" +
+                            "kzJm5vbmNlPTAuMTYzMzgxNjExMTgyODM5Njcmcm9sZT1wdWJsaXNoZXImZXhwaXJlX3RpbWU9MTQ4OTMyODgxOQ==";
+                }
                 intent.putExtra("TOKEN",TOKEN);
                 startActivity(intent);
                 finish();
